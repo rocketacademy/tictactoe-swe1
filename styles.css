@@ -1,3 +1,22 @@
 body{
-  background-color:pink;
+  background-color:white;
+}
+
+.row{
+  border-style: thin;
+    padding:10px;
+    margin-bottom: 100px;
+    max-height: 10px;
+   
+}
+
+.square{
+  border-style:dotted;
+  border-color:grey;
+  display:inline-block;
+  padding:50px;
+  font-size:20px;
+  height: 10px;
+  width: 10px;
+   vertical-align:top;
 }
