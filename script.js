@@ -1,6 +1,7 @@
 //= ========================Global Variables=========================//
 // Set boardSize for TTT
-const boardSize = 5;
+const boardSize = 4;
+
 
 // keep data about the game in a 2-D array
 const board = [];
@@ -9,6 +10,11 @@ const posMatrix = [];
 
 // the element that contains the rows and squares
 let boardElement;
+
+//Track who is the winning player
+let gameWon = false;
+let winnerName;
+
 
 //Global variables for various displays and outputValues
 let gameResultDisplay1;
@@ -24,7 +30,7 @@ let outputValue3 = 'There is no winner';
 let userInput;
 let submitButton;
 let userInputDisplay;
-let numOfSquares;
+let numOfSquares = 3;
 
 
 
@@ -99,26 +105,30 @@ const buildBoard = () => {
         squareClick(i, j);
         square.innerText = posMatrix[i][j];
 
-        // Check Horizontally
-        resetCoordinates();
-        checkWinXY(x, y, 'horizontal');
-        gameResultDisplay1.innerText = `Checked horizontally: ${outputValue1}`;
+        // // Check Horizontally
+        // resetCoordinates();
+        // checkWinXY(x, y, 'horizontal');
+        // gameResultDisplay1.innerText = `Checked horizontally: ${outputValue1}`;
 
-        // Check Vertically
-        resetCoordinates();
-        checkWinXY(x, y, 'vertical');
-        gameResultDisplay2.innerText = `Checked vertically: ${outputValue1}`;
+        // // Check Vertically
+        // resetCoordinates();
+        // checkWinXY(x, y, 'vertical');
+        // gameResultDisplay2.innerText = `Checked vertically: ${outputValue1}`;
 
-        // Check Diagonally Left
-        resetCoordinates();
-        checkWinZ(x, y, 'left');
-        gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue3}`;
+        // // Check Diagonally Left
+        // checkWinZ(x, y, z ,'left');
+        // gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue3}`;
 
-        // Check Diagonally Right
-        resetCoordinates();
-        checkWinZ(x, y, 'right');
-        gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue2}`;
+        // // Check Diagonally Right
+        // checkWinZ(x, y, z ,'right');
+        // gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue2}`;
+
+        //Test
+        checkVarWinXY();
+
       });
+  
+
     }
 
     // add a single row to the board
@@ -198,28 +208,22 @@ const squareClick = (row, column) => {
 // x and y are global variables which hold the global co-ordinates
 // note that X refers to the ROW and Y refers to the COLUMN in horizontal mode
 const checkWinXY = (x, y, direction) => {
-  // Attempt to swap X and Y to check vertically by using intermediate variables
+  // Swap X and Y to check vertically by using intermediate variables
   let a;
   let b;
   let c;
   let d;
-  let e;
-  let f;
 
   if (direction === 'horizontal') {
     a = x;
-    b = y;
+    b = y - 1;
     c = x;
-    d = y - 1;
-    e = x;
-    f = y;
-  } else if (direction === 'vertical') {
-    a = x;
-    b = y;
-    c = x - 1;
     d = y;
-    e = y;
-    f = x;
+  } else if (direction === 'vertical') {
+    a = x - 1;
+    b = y;
+    c = y;
+    d = x;
   }
 
   // We begin the horizontal and vertical checks from the last co-ordinate (bottom right)
@@ -228,15 +232,15 @@ const checkWinXY = (x, y, direction) => {
   // Scenario 1: if the bottom 2 right boxes are not the same,
   // go up 1 row and re-evaluate the 2 right most boxes
   
-  if (posMatrix[a][b] !== posMatrix[c][d] && x >= 0) {
+  if (posMatrix[x][y] !== posMatrix[a][b] && c >= 0) {
     // In the event we reached the last row where x is 0
-    if (e === 0) {
+    if (c === 0) {
       // As long as right pointer is not pointing at the 2nd last box
       // Continue to check the same row's for matches, starting from the 2 right most boxes
-      if (posMatrix[a][b] !== posMatrix[c][d] && y >= 0) {
+      if (posMatrix[x][y] !== posMatrix[a][b] && d >= 0) {
         // BASE CASE: Once we reached the top left 2 boxes where y === 1
         // implicitly there is no match and hence no winner
-        if (f === boardSize-1) {
+        if (d === boardSize-1) {
           console.log('no winner');
           outputValue1 = 'There is no winner';
           return outputValue1;
@@ -262,12 +266,12 @@ const checkWinXY = (x, y, direction) => {
     }
 
     // Scenario 2, if 2 consecutive boxes match (regardless of where in the row)
-  } else if (posMatrix[a][b] === posMatrix[c][d] && f >= 1) {
+  } else if (posMatrix[x][y] === posMatrix[a][b] && d >= 1) {
     // And if the 2 left most boxes are being compared,
     // implicitly means that the whole row is matched - hence the winner
-    if (f === 1) {
-      console.log(`Player ${posMatrix[c][d]} has won!`);
-      outputValue1 = `Player ${posMatrix[c][d]} has won!`;
+    if (d === 1) {
+      console.log(`Player ${posMatrix[a][b]} has won!`);
+      outputValue1 = `Player ${posMatrix[a][b]} has won!`;
       return outputValue1;
     } // Otherwise, shift the pointer 1 left
     // and check for matches for the next consecutive 2 box
@@ -281,7 +285,7 @@ const checkWinXY = (x, y, direction) => {
   }
 };
 
-const checkWinZ = (x, y, bottomSide) => {
+const checkWinZ = (x, y, z, bottomSide) => {
   // using X and Y at initialization implies starting to check from the bottom right hand corner
   if (bottomSide === 'right') {
     if (posMatrix[x][y] === posMatrix[x - 1][y - 1] && x >= 1 && y >= 1) {
@@ -293,12 +297,12 @@ const checkWinZ = (x, y, bottomSide) => {
       x -= 1;
       y -= 1;
 
-      checkWinZ(x, y, bottomSide);
+      checkWinZ(x,y,z, bottomSide);
     }
     // Start matching from the left
   } else if (bottomSide === 'left') {
     if (posMatrix[x][z] === posMatrix[x - 1][z + 1]) {
-      if (x >= 0 && z <= 2) {
+      if (x >= 0 && z <= boardSize-2) {
         if (x === 1 && z === boardSize - 2) {
           console.log(`Player ${posMatrix[x][y]} has won!`);
           outputValue3 = `Player ${posMatrix[x][y]} has won!`;
@@ -306,7 +310,7 @@ const checkWinZ = (x, y, bottomSide) => {
         }
         x -= 1;
         z += 1;
-        checkWinZ(x, z, bottomSide);
+        checkWinZ(x,y,z, bottomSide);
         console.log('here');
       }
     }
@@ -319,8 +323,6 @@ const checkWinZ = (x, y, bottomSide) => {
 };
 
 const resetCoordinates = () => {
-  // x = boardSize - 1;
-  // y = boardSize - 1;
   z = 0;
 };
 
@@ -345,13 +347,25 @@ for(let oX = boardSize;oX - numOfSquares>=0;oX-=1){
     rightAnchorPts[i].row = oY-1;
     i += 1;
   }
-  console.log(rightAnchorPts);
+  return rightAnchorPts;
+}
 }
 
+const checkVarWinXY = () =>{
+//Create the initial set of anchor points
+let rightAnchorPts = createOriginPoints();
+console.log(rightAnchorPts);
+//Go through each of the possible right anchor points and check for matches in XY direction
 
+for(let i = 0; i< rightAnchorPts.length; i+=1){
+checkWinXY(rightAnchorPts[i].row, rightAnchorPts.column,'horizontal' );
 
+checkWinXY(rightAnchorPts[i].row, rightAnchorPts.column,'vertical' );
+  }
+}
 
-
+const checkVarWinZ =() =>{
+  
 }
 
 //= ========================EXECUTE GAME=========================//
