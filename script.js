@@ -13,8 +13,10 @@ let gameResultDisplay1;
 let gameResultDisplay2;
 let gameResultDisplay3;
 let gameResultDisplay4;
-let outputValue;
+let outputValue1;
 let outputValue2 = 'There is no winner';
+let outputValue3 = 'There is no winner';
+let outputValue4 = 'There is no winner';
 
 let currentPlayer = 'X';
 // the element that contains the entire board
@@ -22,8 +24,8 @@ let currentPlayer = 'X';
 const boardContainer = document.createElement('div');
 
 // Global variables to manage co-ordinates tracking for matching purposes
-const x = boardSize - 1;
-const y = boardSize - 1;
+let x = boardSize - 1;
+let y = boardSize - 1;
 // starting co-ordinate used for checking diagonally i.e posMatrix[z][z]
 let z = 0;
 
@@ -80,22 +82,22 @@ const buildBoard = () => {
         // Check Horizontally
         resetCoordinates();
         checkWinXY(x, y, 'horizontal');
-        gameResultDisplay1.innerText = `Checked horizontally: ${outputValue}`;
+        gameResultDisplay1.innerText = `Checked horizontally: ${outputValue1}`;
 
         // Check Vertically
         resetCoordinates();
         checkWinXY(x, y, 'vertical');
-        gameResultDisplay2.innerText = `Checked vertically: ${outputValue}`;
+        gameResultDisplay2.innerText = `Checked vertically: ${outputValue2}`;
 
         // Check Diagonally Left
         resetCoordinates();
         checkWinZ(x, y, 'left');
-        gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue2}`;
+        gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue3}`;
 
         // // Check Diagonally Right
         resetCoordinates();
         checkWinZ(x, y, 'right');
-        gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue2}`;
+        gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue4}`;
       });
     }
 
@@ -170,6 +172,7 @@ const checkWinXY = (x, y, direction) => {
   // Comments are written for the case of checking horizontally
   // Scenario 1: if the bottom 2 right boxes are not the same,
   // go up 1 row and re-evaluate the 2 right most boxes
+  
   if (posMatrix[a][b] !== posMatrix[c][d] && x >= 0) {
     // In the event we reached the last row where x is 0
     if (e === 0) {
@@ -178,7 +181,8 @@ const checkWinXY = (x, y, direction) => {
       if (posMatrix[a][b] !== posMatrix[c][d] && y >= 0) {
         // BASE CASE: Once we reached the top left 2 boxes where y === 1
         // implicitly there is no match and hence no winner
-        if (f === 1) {
+        if (f === boardSize-1) {
+          console.log('no winner');
           outputValue = 'There is no winner';
           return outputValue;
         }
@@ -203,7 +207,7 @@ const checkWinXY = (x, y, direction) => {
     }
 
     // Scenario 2, if 2 consecutive boxes match (regardless of where in the row)
-  } else if (posMatrix[a][b] === posMatrix[c][d] && y >= 1) {
+  } else if (posMatrix[a][b] === posMatrix[c][d] && f >= 1) {
     // And if the 2 left most boxes are being compared,
     // implicitly means that the whole row is matched - hence the winner
     if (f === 1) {
@@ -227,7 +231,8 @@ const checkWinZ = (x, y, bottomSide) => {
   if (bottomSide === 'right') {
     if (posMatrix[x][y] === posMatrix[x - 1][y - 1] && x >= 1 && y >= 1) {
       if (x === 1 && y === 1) {
-        outputValue2 = 'There is a match!';
+        console.log(`Player ${posMatrix[x][y]} has won!`)
+        outputValue = 'There is a match!';
         return outputValue2;
       }
       x -= 1;
@@ -240,9 +245,9 @@ const checkWinZ = (x, y, bottomSide) => {
     if (posMatrix[x][z] === posMatrix[x - 1][z + 1]) {
       if (x >= 0 && z <= 2) {
         if (x === 1 && z === boardSize - 2) {
-          console.log('step3');
-          outputValue2 = 'There is a match!';
-          return outputValue2;
+          console.log(`Player ${posMatrix[x][y]} has won!`);
+          outputValue = 'There is a match!';
+          return outputValue;
         }
         x -= 1;
         z += 1;
@@ -251,16 +256,15 @@ const checkWinZ = (x, y, bottomSide) => {
       }
     }
   } else {
-    console.log('fail');
-
-    outputValue2 = 'There is no match';
-    return outputValue2;
+    console.log('No winner');
+    outputValue = 'There is no match';
+    return outputValue;
   }
 };
 
 const resetCoordinates = () => {
-  // i = boardSize - 1;
-  // j = boardSize - 1;
+  // x = boardSize - 1;
+  // y = boardSize - 1;
   z = 0;
 };
 
