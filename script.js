@@ -14,9 +14,8 @@ let gameResultDisplay2;
 let gameResultDisplay3;
 let gameResultDisplay4;
 let outputValue1;
-let outputValue2 = 'There is no winner';
-let outputValue3 = 'There is no winner';
-let outputValue4 = 'There is no winner';
+let outputValue2; 
+
 
 let currentPlayer = 'X';
 // the element that contains the entire board
@@ -87,17 +86,17 @@ const buildBoard = () => {
         // Check Vertically
         resetCoordinates();
         checkWinXY(x, y, 'vertical');
-        gameResultDisplay2.innerText = `Checked vertically: ${outputValue2}`;
+        gameResultDisplay2.innerText = `Checked vertically: ${outputValue1}`;
 
         // Check Diagonally Left
         resetCoordinates();
         checkWinZ(x, y, 'left');
-        gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue3}`;
+        gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue2}`;
 
-        // // Check Diagonally Right
+        // Check Diagonally Right
         resetCoordinates();
         checkWinZ(x, y, 'right');
-        gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue4}`;
+        gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue2}`;
       });
     }
 
@@ -183,8 +182,8 @@ const checkWinXY = (x, y, direction) => {
         // implicitly there is no match and hence no winner
         if (f === boardSize-1) {
           console.log('no winner');
-          outputValue = 'There is no winner';
-          return outputValue;
+          outputValue1 = 'There is no winner';
+          return outputValue1;
         }
         // Otherwise where y > 1, shift the pointer 1 box to the left and check for matches
         if (direction === 'horizontal') {
@@ -212,8 +211,8 @@ const checkWinXY = (x, y, direction) => {
     // implicitly means that the whole row is matched - hence the winner
     if (f === 1) {
       console.log(`Player ${posMatrix[c][d]} has won!`);
-      outputValue = `Player ${posMatrix[c][d]} has won!`;
-      return outputValue;
+      outputValue1 = `Player ${posMatrix[c][d]} has won!`;
+      return outputValue1;
     } // Otherwise, shift the pointer 1 left
     // and check for matches for the next consecutive 2 box
     if (direction === 'horizontal') {
@@ -232,7 +231,7 @@ const checkWinZ = (x, y, bottomSide) => {
     if (posMatrix[x][y] === posMatrix[x - 1][y - 1] && x >= 1 && y >= 1) {
       if (x === 1 && y === 1) {
         console.log(`Player ${posMatrix[x][y]} has won!`)
-        outputValue = 'There is a match!';
+        outputValue2 = 'There is a match!';
         return outputValue2;
       }
       x -= 1;
@@ -246,8 +245,8 @@ const checkWinZ = (x, y, bottomSide) => {
       if (x >= 0 && z <= 2) {
         if (x === 1 && z === boardSize - 2) {
           console.log(`Player ${posMatrix[x][y]} has won!`);
-          outputValue = 'There is a match!';
-          return outputValue;
+          outputValue2 = 'There is a match!';
+          return outputValue2;
         }
         x -= 1;
         z += 1;
@@ -257,8 +256,8 @@ const checkWinZ = (x, y, bottomSide) => {
     }
   } else {
     console.log('No winner');
-    outputValue = 'There is no match';
-    return outputValue;
+    outputValue2 = 'There is no match';
+    return outputValue2;
   }
 };
 
