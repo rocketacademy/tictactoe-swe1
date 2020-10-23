@@ -13,8 +13,9 @@ let gameResultDisplay1;
 let gameResultDisplay2;
 let gameResultDisplay3;
 let gameResultDisplay4;
-let outputValue1;
-let outputValue2; 
+let outputValue1 = 'There is no winner';
+let outputValue2 = 'There is no winner';
+let outputValue3 = 'There is no winner';
 
 
 let currentPlayer = 'X';
@@ -91,7 +92,7 @@ const buildBoard = () => {
         // Check Diagonally Left
         resetCoordinates();
         checkWinZ(x, y, 'left');
-        gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue2}`;
+        gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue3}`;
 
         // Check Diagonally Right
         resetCoordinates();
@@ -231,7 +232,7 @@ const checkWinZ = (x, y, bottomSide) => {
     if (posMatrix[x][y] === posMatrix[x - 1][y - 1] && x >= 1 && y >= 1) {
       if (x === 1 && y === 1) {
         console.log(`Player ${posMatrix[x][y]} has won!`)
-        outputValue2 = 'There is a match!';
+        outputValue2 = `Player ${posMatrix[x][y]} has won!`;
         return outputValue2;
       }
       x -= 1;
@@ -245,8 +246,8 @@ const checkWinZ = (x, y, bottomSide) => {
       if (x >= 0 && z <= 2) {
         if (x === 1 && z === boardSize - 2) {
           console.log(`Player ${posMatrix[x][y]} has won!`);
-          outputValue2 = 'There is a match!';
-          return outputValue2;
+          outputValue3 = `Player ${posMatrix[x][y]} has won!`;
+          return outputValue3;
         }
         x -= 1;
         z += 1;
@@ -257,7 +258,8 @@ const checkWinZ = (x, y, bottomSide) => {
   } else {
     console.log('No winner');
     outputValue2 = 'There is no match';
-    return outputValue2;
+    outputValue3 = 'There is no match';
+    return;
   }
 };
 
