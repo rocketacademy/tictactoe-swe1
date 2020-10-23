@@ -20,3 +20,8 @@ body{
   width: 10px;
    vertical-align:top;
 }
+
+#input{
+  max-width: 800px;
+
+}

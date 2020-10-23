@@ -1,6 +1,6 @@
 //= ========================Global Variables=========================//
 // Set boardSize for TTT
-const boardSize = 3;
+const boardSize = 5;
 
 // keep data about the game in a 2-D array
 const board = [];
@@ -9,13 +9,23 @@ const posMatrix = [];
 
 // the element that contains the rows and squares
 let boardElement;
+
+//Global variables for various displays and outputValues
 let gameResultDisplay1;
 let gameResultDisplay2;
 let gameResultDisplay3;
 let gameResultDisplay4;
+
 let outputValue1 = 'There is no winner';
 let outputValue2 = 'There is no winner';
 let outputValue3 = 'There is no winner';
+
+//Global var for taking in specified numOfSquares to win 
+let userInput;
+let submitButton;
+let userInputDisplay;
+let numOfSquares;
+
 
 
 let currentPlayer = 'X';
@@ -24,10 +34,20 @@ let currentPlayer = 'X';
 const boardContainer = document.createElement('div');
 
 // Global variables to manage co-ordinates tracking for matching purposes
+// x and y are also the 'origins' of the match-checking(horizontal + vertical)
+// x and y are also the 'origins' of checking from bottom-right to top left
 let x = boardSize - 1;
 let y = boardSize - 1;
-// starting co-ordinate used for checking diagonally i.e posMatrix[z][z]
+// Variable Z is a starting co-ordinate used for used for traversing columns when checking diagonally (instead of y from bot-left to top-right );
 let z = 0;
+
+
+//New global variables to track possible origins where numOfSquares < boardSize
+
+let oX = boardSize;
+let oY = boardSize;
+let oZ = boardSize;
+
 
 //= ========================Helper Functions=========================//
 
@@ -110,14 +130,49 @@ const buildBoard = () => {
   }
 };
 
+//create fn that takes in user input + validation
+const createUserInput = () =>{
+  userInput = document.createElement('input');
+  userInput.setAttribute('id','input')
+  userInput.setAttribute('placeholder','Please enter number of squares in a row that makes a win.')
+
+  userInputDisplay = document.createElement('div');
+
+
+  submitButton = document.createElement('button');
+  submitButton.innerHTML = 'Submit';
+  submitButton.setAttribute('id','button');
+  submitButton.addEventListener('click',()=>{
+    let input = document.querySelector('#input')
+    if(isNaN(input.value)){
+      console.log('test');
+        userInputDisplay.innerHTML = `Please enter a valid number`;
+    } else {
+     userInputDisplay.innerHTML = `User chose ${input.value} consecutive squares as winning criteria.`;  
+     numOfSquares = Number(input.value);
+    }
+    return;
+  })  
+  
+  
+  document.body.appendChild(userInput);
+  document.body.appendChild(submitButton);
+  document.body.appendChild(userInputDisplay);
+
+
+}
+
+
 // create the board container element and put it on the screen
 const gameInit = () => {
   document.body.appendChild(boardContainer);
 
   // build the board - right now it's empty
-  // createPositionMatrix and createInversePositionMatrix
+  // createPositionMatrix for tracking coordinates
   createPosMatrix();
   buildBoard();
+  createUserInput();
+
 };
 
 // switch the global values from one player to the next
@@ -269,5 +324,35 @@ const resetCoordinates = () => {
   z = 0;
 };
 
-// EXECUTE GAME BELOW:
+//To generate a permutation of places for numOfCards in a larger than 3x3 permutation grid to check for matches
+const createOriginPoints = () =>{
+
+//anchorPts store the origins for variable numOfSquare game
+//columns and rows are zero-indexed
+let rightAnchorPts = [];
+//To add another anchorPt in the array, increment by 1
+let i = 0;
+
+//oX refers to rows
+//oY refers to column
+//using oX instead of generic variable document the draw linkage to the oX global variable
+
+for(let oX = boardSize;oX - numOfSquares>=0;oX-=1){
+  for(let oY = boardSize;oY - numOfSquares>=0;oY-=1){
+    rightAnchorPts.push({});
+    rightAnchorPts[i].point = i+1;
+    rightAnchorPts[i].column = oX-1;
+    rightAnchorPts[i].row = oY-1;
+    i += 1;
+  }
+  console.log(rightAnchorPts);
+}
+
+
+
+
+
+}
+
+//= ========================EXECUTE GAME=========================//
 gameInit();
