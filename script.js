@@ -1,6 +1,6 @@
 //= ========================Global Variables=========================//
 // Set boardSize for TTT
-const boardSize = 4;
+const boardSize = 3;
 
 
 // keep data about the game in a 2-D array
@@ -117,13 +117,13 @@ const buildBoard = () => {
         // checkWinXY(x, y, 'vertical',boardSize);
         // gameResultDisplay2.innerText = `Checked vertically: ${outputValue1}`;
 
-        //Need to change diagonal
+        
         // // Check Diagonally Left
-        // checkWinZ(x, y, z ,'left');
+        // checkWinZ(x, y, z ,'diagonal-left',boardSize);
         // gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue3}`;
 
         // // Check Diagonally Right
-        // checkWinZ(x, y, z ,'right');
+        // checkWinZ(x, y, z ,'diagonal-right',boardSize);
         // gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue2}`;
 
         //Test
@@ -208,7 +208,13 @@ const squareClick = (row, column) => {
     togglePlayer();
   }
 };
-
+//Fn to reset all global co-ordinates to the (assigned) initial origin(anchor) co-ordinates
+const resetCoordinates = () => {
+initialRow = '';
+initialCol = '';
+z = 0;
+};
+//Fn to track every possible anchorpoints for each run of checkWinXY and checkWinZ
 const trackAnchorPoints = (oX,oY,direction)=>{
   if (direction === 'horizontal'){
   initialRow = oX;
@@ -216,9 +222,10 @@ const trackAnchorPoints = (oX,oY,direction)=>{
   }else if(direction === 'vertical') { //swap the anchor points
   initialRow = oY;
   initialCol = oX;
-  }
+  // }else if (direction === 'diagonal-right'){
+  // z = oY - (size-1);
+  } 
 }
-
 // Fn to check for winners vertically or horizontally
 // Input 'horizontal' or  'vertical' to check for matches
 // x and y are global variables which hold the global co-ordinates
@@ -299,9 +306,9 @@ const checkWinXY = (x, y, direction,size) => {
   }
 };
 
-const checkWinZ = (x, y, z, bottomSide) => {
+const checkWinZ = (x, y, z, bottomSide,size) => {
   // using X and Y at initialization implies starting to check from the bottom right hand corner
-  if (bottomSide === 'right') {
+  if (bottomSide === 'diagonal-right') {
     if (posMatrix[x][y] === posMatrix[x - 1][y - 1] && x >= 1 && y >= 1) {
       if (x === 1 && y === 1) {
         console.log(`Player ${posMatrix[x][y]} has won!`)
@@ -311,36 +318,33 @@ const checkWinZ = (x, y, z, bottomSide) => {
       x -= 1;
       y -= 1;
 
-      checkWinZ(x,y,z, bottomSide);
+      checkWinZ(x,y,z, bottomSide,size);
     }
     // Start matching from the left
-  } else if (bottomSide === 'left') {
+  } else if (bottomSide === 'diagonal-left') {
+    console.log(z);
     if (posMatrix[x][z] === posMatrix[x - 1][z + 1]) {
-      if (x >= 0 && z <= boardSize-2) {
-        if (x === 1 && z === boardSize - 2) {
+      if (x >= 0 && z <= size - 2) {
+        if (x === 1 && z === size - 2) {
           console.log(`Player ${posMatrix[x][y]} has won!`);
           outputValue3 = `Player ${posMatrix[x][y]} has won!`;
           return outputValue3;
         }
         x -= 1;
         z += 1;
-        checkWinZ(x,y,z, bottomSide);
+        checkWinZ(x,y,z,bottomSide,size);
         console.log('here');
       }
     }
   } else {
     console.log('No winner');
+    //2 different outputvalues are required so that it does not conflict
     outputValue2 = 'There is no match';
     outputValue3 = 'There is no match';
     return;
   }
 };
 
-const resetCoordinates = () => {
-initialRow = '';
-initialCol = '';
-  z = 0;
-};
 
 //To generate a permutation of places for numOfCards in a larger than 3x3 permutation grid to check for matches
 const createOriginPoints = () =>{
@@ -377,14 +381,26 @@ console.log(rightAnchorPts);
 for(let i = 0; i< rightAnchorPts.length; i+=1){
 let x = rightAnchorPts[i].row;
 let y = rightAnchorPts[i].column;
+let z = oY - numOfSquares; //column - (size-1) [numOfSquares is already 0 indexed];
 
-resetCoordinates();
-trackAnchorPoints(x,y,'horizontal');
-checkWinXY(x, y,'horizontal',numOfSquares );
 
-resetCoordinates();
+// //Check Horizontally
+// resetCoordinates();
+// trackAnchorPoints(x,y,'horizontal');
+// checkWinXY(x, y,'horizontal',numOfSquares );
+
+// // Check Vertically
+// resetCoordinates();
 trackAnchorPoints(x,y,'vertical');
-checkWinXY(x, y,'vertical',numOfSquares );
+// checkWinXY(x,y,'vertical',numOfSquares );
+
+//Check Diagonally --Note z is still
+//trackAnchorPoints not necessary as checkWinZ does not flip the co-ordinates in the same way
+checkWinZ(x,y,z,'diagonal-right',numOfSquares );
+
+//trackAnchorPoints helps to reassign the value of Z to the appropriate one
+// trackAnchorPoints(x,y,'diagonal-left');
+checkWinZ(x,y,z,'diagonal-left',numOfSquares );
 
   }
 }
