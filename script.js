@@ -1,31 +1,16 @@
 // Global setup ================================================
+// delay in millisecs before game resets
+const delayInMillisecToResetGame = 2000;
+
 // keep data about the game in a 2-D array
 let board = [];
-
 // size of board in length
 let boardSize;
-
 // the element that contains the rows and squares
 let boardElement;
-
 // the element that contains the entire board
 // we can empty it out for convenience
 let boardContainer;
-
-// current player global starts at X
-let currentPlayer = 'X';
-
-// element that contains the win message
-const winMessageElement = document.createElement('p');
-
-// variable to store number of matching symbols needed to meet the winning condition.
-let matchesToWin;
-
-// if isWin is true, then there is a winner
-let isWin = false;
-
-// delay in millisecs before game resets
-const delayInMillisecToResetGame = 2000;
 
 // container for input box and button for user to submit the board size
 let boardSizeContainer;
@@ -34,11 +19,22 @@ let boardSizeInputBox;
 // button for user to submit the board size
 let boardSizeButton;
 
+// current player global starts at X
+let currentPlayer = 'X';
+
+// variable to store number of matching symbols needed to meet the winning condition.
+let matchesToWin;
+// if isWin is true, then there is a winner
+let isWin = false;
+
 // Helper functions ===========================================================
 // to create elements and containers to display content when browser loads
 const initialiseStartingElements = () => {
+  // container for the board elements
   boardContainer = document.createElement('div');
   boardContainer.classList.add('board-container');
+
+  // container and elements for player to input board size
   boardSizeContainer = document.createElement('div');
   boardSizeInputBox = document.createElement('input');
   boardSizeInputBox.setAttribute('placeholder', 'board size');
@@ -151,6 +147,9 @@ const checkWin = () => {
   return isWin;
 };
 
+// to create element that contains the win message
+const createWinMessageElement = () => document.createElement('p');
+
 // to switch the global values from one player to the next
 const togglePlayer = () => {
   if (currentPlayer === 'X') {
@@ -179,6 +178,7 @@ const squareClick = (column, row, buildBoard) => {
       const winner = currentPlayer;
 
       // display win message
+      const winMessageElement = createWinMessageElement();
       winMessageElement.innerText = `${winner} has won!`;
       document.body.appendChild(winMessageElement);
 
