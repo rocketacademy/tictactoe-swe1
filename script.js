@@ -1,6 +1,6 @@
 //= =======================Global Variables=========================//
 // Set boardSize for TTT
-const boardSize = 3;
+let boardSize = 3;
 
 // keep data about the game in a 2-D array
 const board = [];
@@ -12,6 +12,10 @@ let boardElement;
 
 // Track who is the winning player
 let gameWon = false;
+let winner = '';
+
+// Game display page
+let gamePage;
 
 // Global variables for various displays and outputValues
 let gameResultDisplay1;
@@ -26,7 +30,8 @@ let gameResultDisplay7;
 let gameResultDisplay8;
 
 // For displaying other outputMessages
-let outputMessages;
+const outputMessages = document.createElement('div');
+outputMessages.innerText = 'Please input number of squares or if blank, play the full board size. \nPlayer X begins first.';
 
 // Display of checks for fixed BoardSize
 let outputValue1 = '';
@@ -42,10 +47,13 @@ let initialRow;
 let initialCol;
 
 // Global var for taking in specified numOfSquares to win
-let userInput;
-let submitButton;
-let userInputDisplay;
-let numOfSquares = userInput;
+let numSquaresInput;
+let boardSizeInput;
+let numSquaresBtn; // submit numSquares
+let boardSizeBtn; // submit boardSize
+let numSquaresInputDisplay;
+let boardSizeInputDisplay;
+let numOfSquares = numSquaresInput;
 
 let currentPlayer = 'X';
 // the element that contains the entire board
@@ -82,6 +90,8 @@ const buildBoard = () => {
   boardElement = document.createElement('div');
   boardElement.classList.add('board');
 
+  gamePage = document.createElement('div');
+
   gameResultDisplay1 = document.createElement('div');
   gameResultDisplay2 = document.createElement('div');
   gameResultDisplay3 = document.createElement('div');
@@ -91,8 +101,6 @@ const buildBoard = () => {
   gameResultDisplay6 = document.createElement('div');
   gameResultDisplay7 = document.createElement('div');
   gameResultDisplay8 = document.createElement('div');
-
-  outputMessages = document.createElement('div');
 
   // move through the board data array and create the
   // current state of the board
@@ -115,11 +123,11 @@ const buildBoard = () => {
       // eslint-disable-next-line
       square.addEventListener('click', () => {
         squareClick(i, j);
-        //
+
         if (square.innerText === '') {
           square.innerText = posMatrix[i][j];
           outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
-        } else {
+        } else if (square.innerText !== '') {
           outputMessages.innerText = 'You may not click on the same square again!';
           setTimeout(() => {
             outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
@@ -150,63 +158,92 @@ const buildBoard = () => {
           trackAnchorPoints(x, y, 'bot-right', boardSize);
           checkWinZ(x, y, z, 'bot-right', boardSize);
           gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue2}`;
+
+          // after checking, if gameWon is true, then restart Game and output relevant message
+          gameOver();
         } else {
         // Check for matches if variable numOfSquares are defined
           checkVarWin();
+          gameOver();
         }
       });
     }
-
+    console.log('test2');
     // add a single row to the board
     boardContainer.appendChild(rowElement);
-    document.body.appendChild(gameResultDisplay1);
-    document.body.appendChild(gameResultDisplay2);
-    document.body.appendChild(gameResultDisplay3);
-    document.body.appendChild(gameResultDisplay4);
-    document.body.appendChild(gameResultDisplay5);
-    document.body.appendChild(gameResultDisplay6);
-    document.body.appendChild(gameResultDisplay7);
-    document.body.appendChild(gameResultDisplay8);
-    document.body.appendChild(outputMessages);
+    gamePage.appendChild(boardContainer);
+    gamePage.appendChild(gameResultDisplay1);
+    gamePage.appendChild(gameResultDisplay2);
+    gamePage.appendChild(gameResultDisplay3);
+    gamePage.appendChild(gameResultDisplay4);
+    gamePage.appendChild(gameResultDisplay5);
+    gamePage.appendChild(gameResultDisplay6);
+    gamePage.appendChild(gameResultDisplay7);
+    gamePage.appendChild(gameResultDisplay8);
+    // gamePage.appendChild(outputMessages);
+    document.body.appendChild(gamePage);
   }
 };
 
 // create fn that takes in user input + validation
 const createUserInput = () => {
-  userInput = document.createElement('input');
-  userInput.setAttribute('id', 'input');
-  userInput.setAttribute('placeholder', 'Please enter number of squares in a row that makes a win.');
+  numSquaresInput = document.createElement('input');
+  numSquaresInput.setAttribute('id', 'numSquaresInput');
+  numSquaresInput.setAttribute('placeholder', 'Enter number of squares in a row that makes a win.');
 
-  userInputDisplay = document.createElement('div');
+  boardSizeInput = document.createElement('input');
+  boardSizeInput.setAttribute('id', 'boardSizeInput');
+  boardSizeInput.setAttribute('placeholder', 'Enter board size.');
 
-  submitButton = document.createElement('button');
-  submitButton.innerHTML = 'Submit';
-  submitButton.setAttribute('id', 'button');
-  submitButton.addEventListener('click', () => {
-    const input = document.querySelector('#input');
+  // displays message on user's input on num of squares
+  numSquaresInputDisplay = document.createElement('div');
+  boardSizeInputDisplay = document.createElement('div');
+  // submit button for numSquaresInput
+  numSquaresBtn = document.createElement('button');
+  numSquaresBtn.innerHTML = 'Submit';
+  numSquaresBtn.setAttribute('id', 'button');
+  numSquaresBtn.addEventListener('click', () => {
+    const input = document.querySelector('#numSquaresInput');
     if (isNaN(input.value)) {
-      console.log('test');
-      userInputDisplay.innerHTML = 'Please enter a valid number';
+      numSquaresInputDisplay.innerHTML = 'Please enter a valid number';
     } else {
-      userInputDisplay.innerHTML = `User chose ${input.value} consecutive squares as winning criteria.`;
+      numSquaresInputDisplay.innerHTML = `User chose ${input.value} consecutive squares as winning criteria.`;
       numOfSquares = Number(input.value);
     }
   });
 
-  document.body.appendChild(userInput);
-  document.body.appendChild(submitButton);
-  document.body.appendChild(userInputDisplay);
+  boardSizeBtn = document.createElement('button');
+  boardSizeBtn.innerHTML = 'Submit';
+  boardSizeBtn.setAttribute('id', 'button');
+  boardSizeBtn.addEventListener('click', () => {
+    const input = document.querySelector('#boardSizeInput');
+    if (isNaN(input.value)) {
+      boardSizeInputDisplay.innerHTML = 'Please enter a valid number';
+    } else {
+      boardSizeInputDisplay.innerHTML = `User chose ${input.value} as board size.`;
+      boardSizeInput = Number(input.value);
+    }
+    resetGame();
+    boardSize = boardSizeInput;
+  });
+
+  gamePage.appendChild(numSquaresInput);
+  gamePage.appendChild(numSquaresBtn);
+  gamePage.appendChild(numSquaresInputDisplay);
+
+  gamePage.appendChild(boardSizeInput);
+  gamePage.appendChild(boardSizeBtn);
+  gamePage.appendChild(boardSizeInputDisplay);
 };
 
 // create the board container element and put it on the screen
 const gameInit = () => {
-  document.body.appendChild(boardContainer);
-
   // build the board - right now it's empty
   // createPositionMatrix for tracking coordinates
   createPosMatrix();
   buildBoard();
   createUserInput();
+  document.body.appendChild(outputMessages);
 };
 
 // switch the global values from one player to the next
@@ -220,7 +257,7 @@ const togglePlayer = () => {
 
 const squareClick = (row, column) => {
   // see if the clicked square has been clicked on before
-  if (posMatrix[row][column] !== 'X' && posMatrix[row][column] !== 'O') {
+  if (gameWon !== true && posMatrix[row][column] !== 'X' && posMatrix[row][column] !== 'O') {
     // alter the data array, set it to the current player
     posMatrix[row][column] = currentPlayer;
     togglePlayer();
@@ -250,7 +287,7 @@ const trackAnchorPoints = (oX, oY, direction, size) => {
     console.log('z is reset');
   }
 };
-// Fn to check for winners vertically or horizontally
+// Fn to check for matches vertically or horizontally
 // Input 'horizontal' or  'vertical' to check for matches
 // x and y are global variables which hold the global co-ordinates
 // note that X refers to the ROW and Y refers to the COLUMN in horizontal mode
@@ -309,6 +346,8 @@ const checkWinXY = (x, y, direction, size) => {
     // implicitly means that the whole row is matched - hence the winner
     if (d === initialCol - (size - 2)) { // d === 1
       console.log(`Player ${posMatrix[a][b]} has won!`);
+      winner = `${posMatrix[a][b]}`;
+      gameWon = true;
       outputValue1 = `Player ${posMatrix[a][b]} has won!`;
       outputValue4 = `Player ${posMatrix[a][b]} has won!`;
       return outputValue1;
@@ -324,15 +363,18 @@ const checkWinXY = (x, y, direction, size) => {
   }
 };
 
+// Fn to check for matches diagonally
 const checkWinZ = (x, y, z, direction, size) => {
   // using X and Y at initialization implies starting to check from the bottom right hand corner
   if (direction === 'bot-right') {
     if (posMatrix[x][y] === posMatrix[x - 1][y - 1]) {
       if (x === initialRow - (size - 2) && y === initialCol - (size - 2)) { // (x === 1 && y === 1)
         console.log(`Player ${posMatrix[x][y]} has won!`);
+        winner = `${posMatrix[x][y]}`;
+        gameWon = true;
         outputValue2 = `Player ${posMatrix[x][y]} has won!`;
         outputValue5 = outputValue2;
-        gameWon = true;
+
         return outputValue2;
       }
       x -= 1;
@@ -344,6 +386,8 @@ const checkWinZ = (x, y, z, direction, size) => {
   } else if (direction === 'bot-left') {
     if (posMatrix[x][z] === posMatrix[x - 1][z + 1]) {
       if (x === initialRow - (size - 2) && z === initialCol - 1) { // x === 1 & z === 1
+        winner = `${posMatrix[x][z]}`;
+        gameWon = true;
         console.log(`Player ${posMatrix[x][z]} has won!`);
         outputValue3 = `Player ${posMatrix[x][z]} has won!`;
         outputValue6 = outputValue3;
@@ -362,7 +406,7 @@ const checkWinZ = (x, y, z, direction, size) => {
 };
 
 // To generate a permutation of places for numOfCards in a larger than 3x3 permutation grid to check for matches
-const createOriginPoints = () => {
+const createAnchorPoints = () => {
 // anchorPts store the origins for variable numOfSquare game
   // columns and rows are zero-indexed
   const rightAnchorPts = [];
@@ -387,7 +431,7 @@ const createOriginPoints = () => {
 
 const checkVarWin = () => {
 // Create the initial set of anchor points
-  const rightAnchorPts = createOriginPoints();
+  const rightAnchorPts = createAnchorPoints();
   console.log(rightAnchorPts);
 
   // Go through each of the possible right anchor points and check for matches in XY direction
@@ -415,6 +459,42 @@ const checkVarWin = () => {
     trackAnchorPoints(x, y, 'bot-right', numOfSquares);
     checkWinZ(x, y, z, 'bot-right', numOfSquares);
     gameResultDisplay8.innerText = `Var Cards -Check top-right to bottom-left diagonally: ${outputValue6}`;
+  }
+};
+
+const resetGame = () => {
+  let countDown = 5;
+  // reset the arrays;
+  board.length = 0;
+  posMatrix.length = 0;
+  gameWon = false;
+  winner = '';
+  outputValue1 = '';
+  outputValue2 = '';
+  outputValue3 = '';
+  outputValue4 = '';
+  outputValue5 = '';
+  outputValue6 = '';
+  currentPlayer = 'X';
+
+  const restartGame = setInterval(() => {
+    outputMessages.innerText = `Game is restarting in ${countDown}...`;
+    countDown -= 1;
+    if (countDown === 0) {
+      clearInterval(restartGame);
+      boardContainer.innerHTML = '';
+      gamePage.innerHTML = '';
+      gameInit();
+      outputMessages.innerText = 'Please input number of squares or if blank, play the full board size. \nPlayer X begins first.';
+    }
+  }, 1000);
+};
+
+const gameOver = () => {
+  if (gameWon === true) {
+    resetGame();
+    console.log(winner, 'winner');
+    outputMessages.innerText = `Game over! Player ${winner} wins!`;
   }
 };
 
