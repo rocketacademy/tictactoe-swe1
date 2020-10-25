@@ -4,9 +4,9 @@ body{
 
 .row{
   border-style: thin;
-    padding:10px;
-    margin-bottom: 100px;
-    max-height: 10px;
+  padding:10px;
+  margin-bottom: 100px;
+  max-height: 10px;
    
 }
 
@@ -14,14 +14,14 @@ body{
   border-style:dotted;
   border-color:grey;
   display:inline-block;
+  vertical-align:top;
   padding:50px;
   font-size:20px;
   height: 10px;
   width: 10px;
-   vertical-align:top;
+  
 }
 
 #input{
   max-width: 800px;
-
 }

@@ -17,7 +17,7 @@ let currentPlayer = 'X';
 
 // Declares a matrix that tracks the positions of available,'X' and 'O' squares
 // on the board for matching purposes. Available positions are represented by
-// string-numbers
+// string-numbers created in initPosMatrix()
 const posMatrix = [];
 
 // To track row and column co-ordinates of 'origin' points for matching purposes
@@ -619,19 +619,22 @@ const buildBoard = () => {
         if (playerTurn === 'player') {
           squareClick(i, j);
           if (square.innerText === '') {
-            console.log(posMatrix[i][j]);
-            square.innerText = posMatrix[i][j];
-            outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
-            // Function implicitly checks if gamePlayMode is true, if yes, then switch to 'computer'
-            togglePlayerTurn();
-            console.log(playerTurn, 'playerTurn');
-            // Function implicitly checks if playerTurn is 'computer', computer chooses
-            computerRandSelect();
+            if (gameWon === false) {
+              console.log(posMatrix[i][j]);
+              square.innerText = posMatrix[i][j];
+              outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
+              // Function implicitly checks if gamePlayMode is true,
+              // if yes, then switch to 'computer'
+              togglePlayerTurn();
+              console.log(playerTurn, 'playerTurn');
+              // Function implicitly checks if playerTurn is 'computer', computer chooses
+              computerRandSelect();
+            } else {
+              outputMessages.innerText = 'Please wait for game to restart...';
+            }
           }
-        }
-
-        if (square.innerText !== '') {
-          outputMessages.innerText = 'You may not click on the same square again!';
+        } else if (square.innerText !== '') {
+          outputMessages.innerText = 'You cannot click on this square again!';
           // Turn off player-turn display when game ends and output game-over message only
           const userTurnDisplayRef = setTimeout(() => {
             if (gameWon === false) {
