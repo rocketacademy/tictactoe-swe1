@@ -1,14 +1,59 @@
-//= =======================Global Variables=========================//
+// ========================Global Variables===============================//
+
+// -------------------General --------------------------------------------//
 // Set boardSize for TTT
 let boardSize = 4;
+
+// Track whether game is won or not
+let gameWon = false;
+
+// Track who is the winning player
+let winner = '';
+
+// Tracks current player, either X or O
+let currentPlayer = 'X';
+
+// -------------------Co-ordinates Tracking &  Management-----------------//
 
 // Declares a matrix that tracks the positions of empty,X and O squares
 // of the board for matching purposes
 const posMatrix = [];
 
-// Track who is the winning player
-let gameWon = false;
-let winner = '';
+// To track row and column co-ordinates of 'origin' points for matching purposes
+// Var x and y are also the 'origin' points for match-checking in the directions of
+// 'horizontal', 'vertical' and diagonally (starting from) 'bot-right' & 'bot-left'
+const x = boardSize - 1;
+const y = boardSize - 1;
+
+// Var z is the starting column co-ordinate used for
+// checking diagonally (starting from) from bot-left to top-right;
+// Can be recalculated depending on size either size of board or num of squares to win
+let z = 0;
+
+// Tracks initial anchor-points (origins) for numOfSquares
+// Variables initialRow and initialCol are zero-indexed
+let initialRow;
+let initialCol;
+
+// -----------------'Computer' Mode Configurations------------------------//
+// gamePlayMode tracks whether the game is played in
+// 'normal' mode or against 'computer'
+let gamePlayMode = 'normal';
+
+// Tracks either 'player' or 'computer' turn in 'computer' gamePlayMode
+let playerTurn = 'player';
+
+// Tracks available moves left to determine whether game is over
+// in scenario with no winners
+let movesLeft;
+
+// ---------------------------HTML Elements ------------------------------//
+// To display miscellaneous messages such as game over, restarting game etc.
+const outputMessages = document.createElement('div');
+outputMessages.innerText = 'Please input number of squares or if blank, play the full board size. \nPlayer X begins first.';
+
+// The element that contains the entire board
+const boardContainer = document.createElement('div');
 
 // Game display page
 let gamePage;
@@ -25,10 +70,6 @@ let gameResultDisplay6;
 let gameResultDisplay7;
 let gameResultDisplay8;
 
-// To display miscellaneous messages such as game over, restarting game etc.
-const outputMessages = document.createElement('div');
-outputMessages.innerText = 'Please input number of squares or if blank, play the full board size. \nPlayer X begins first.';
-
 // Display of the results after checking
 // for matches for scenario of fixed BoardSize
 let outputValue1 = '';
@@ -41,56 +82,25 @@ let outputValue4 = '';
 let outputValue5 = '';
 let outputValue6 = '';
 
-// Tracks initial anchor-points (origins) for numOfSquares
-// Variables initialRow and initialCol are zero-indexed
-let initialRow;
-let initialCol;
-
 // Tracks user input on desired numOfSquares to win
 let numSquaresInput;
-// Tracks user input on desired board size to play
-let boardSizeInput;
-let submitNumSquaresBtn;
-let submitBoardSizeBtn;
-let numSquaresInputDisplay;
-let boardSizeInputDisplay;
 
 // Refers to player's discretionary number of squares in a row as
 // criteria for game to be won
 let numOfSquares = numSquaresInput;
 
-// Tracks current player, either X or O
-let currentPlayer = 'X';
+// Tracks user input on desired board size to play
+let boardSizeInput;
 
+let submitNumSquaresBtn;
+let submitBoardSizeBtn;
 // Toggle between 'normal' mode or 'computer' - play mode;
 let changeGamePlayModeBtn;
 
-// gamePlayMode tracks whether the game is played in
-// 'normal' mode or against 'computer'
-let gamePlayMode = 'normal';
+let numSquaresInputDisplay;
+let boardSizeInputDisplay;
 
-// Tracks either 'player' or 'computer' turn in 'computer' gamePlayMode
-let playerTurn = 'player';
-
-// Tracks available moves left to determine whether game is over
-// in scenario with no winners
-let movesLeft;
-
-// The element that contains the entire board
-const boardContainer = document.createElement('div');
-
-// To track row and column co-ordinates of 'origin' points for matching purposes
-// Var x and y are also the 'origin' points for match-checking in the directions of
-// 'horizontal', 'vertical' and diagonally (starting from) 'bot-right' & 'bot-left'
-const x = boardSize - 1;
-const y = boardSize - 1;
-
-// Var z is the starting column co-ordinate used for
-// checking diagonally (starting from) from bot-left to top-right;
-// Can be recalculated depending on size either size of board or num of squares to win
-let z = 0;
-
-//= ========================Helper Functions=========================//
+// ========================Helper Functions=========================//
 
 // Function used to initialise posMatrix and assign numbers
 // starting from 0 to (n x n -1) to track empty squares
@@ -101,182 +111,6 @@ const initPosMatrix = () => {
       posMatrix[i][j] = `${i * boardSize + j}`;
     }
   }
-};
-
-// Function that completely rebuilds the entire board every time there's a click
-const buildBoard = () => {
-  // Initialise overall container that hold
-  // 1)board display and 2) the result display elements
-  gamePage = document.createElement('div');
-
-  // Initialise match results for fixed board size games
-  gameResultDisplay1 = document.createElement('div');
-  gameResultDisplay2 = document.createElement('div');
-  gameResultDisplay3 = document.createElement('div');
-  gameResultDisplay4 = document.createElement('div');
-
-  // Initialise match results for variable board size games
-  gameResultDisplay5 = document.createElement('div');
-  gameResultDisplay6 = document.createElement('div');
-  gameResultDisplay7 = document.createElement('div');
-  gameResultDisplay8 = document.createElement('div');
-
-  for (let i = 0; i < boardSize; i += 1) {
-    // Create a row for each horizontal layer of the board
-    const rowElement = document.createElement('div');
-    rowElement.classList.add('row');
-
-    for (let j = 0; j < boardSize; j += 1) {
-      // Create a square for column in the row
-      const square = document.createElement('div');
-      square.classList.add('square');
-
-      // Sets an unique id to each square so 'computer'
-      // can identify and append its selection
-      square.setAttribute('id', `${posMatrix[i][j]}`);
-      rowElement.appendChild(square);
-
-      // Set a click eventListener to each square element
-      // Disabling next-lines for lines below as it seems to be too long apparently
-      // eslint-disable-next-line
-      square.addEventListener('click', () => {
-        // Check number of empty squares left i.e moves
-        movesLeft = getAvailPosArray().length - 1;
-        console.log(movesLeft, 'movesLeft');
-        if (playerTurn === 'player') {
-          squareClick(i, j);
-          if (square.innerText === '') {
-            square.innerText = posMatrix[i][j];
-            outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
-            togglePlayerTurn();
-            console.log(playerTurn, 'playerTurn');
-            computerRandSelect();
-          }
-        }
-        if (square.innerText !== '') {
-          outputMessages.innerText = 'You may not click on the same square again!';
-          // Turn off player turn display when game ends and output gameover message only
-          const userTurnDisplayRef = setTimeout(() => {
-            if (gameWon === false) {
-              outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
-            } else if (gameWon === true || (gameWon === false && movesLeft === 0)) {
-              clearInterval(userTurnDisplayRef);
-            }
-          }, 2000);
-        }
-
-        // ======================Logic for checking for matches======================//
-        if (!numOfSquares) {
-        // Check from end to end of the board
-        // Check Horizontally
-          resetAnchorPts();
-          trackAnchorPts(x, y, 'horizontal', 'boardSize');
-          checkWinXY(x, y, 'horizontal', boardSize);
-          gameResultDisplay1.innerText = `Checked horizontally: ${outputValue1}`;
-
-          // Check Vertically
-          resetAnchorPts();
-          trackAnchorPts(x, y, 'vertical', 'boardSize');
-          checkWinXY(x, y, 'vertical', boardSize);
-          gameResultDisplay2.innerText = `Checked vertically: ${outputValue1}`;
-
-          // Check Diagonally Left
-          trackAnchorPts(x, y, 'bot-left', boardSize);
-          checkWinZ(x, y, z, 'bot-left', boardSize);
-          gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue3}`;
-
-          // Check Diagonally Ri"ght
-          trackAnchorPts(x, y, 'bot-right', boardSize);
-          checkWinZ(x, y, z, 'bot-right', boardSize);
-          gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue2}`;
-
-          // after checking, if gameWon is true, then restart Game and output relevant message
-          gameOver();
-        } else {
-        // Check for matches if variable numOfSquares are defined
-          checkVarWin();
-          gameOver();
-        }
-      });
-    }
-    console.log('test2');
-    // add a single row to the board
-    boardContainer.appendChild(rowElement);
-    gamePage.appendChild(boardContainer);
-    gamePage.appendChild(gameResultDisplay1);
-    gamePage.appendChild(gameResultDisplay2);
-    gamePage.appendChild(gameResultDisplay3);
-    gamePage.appendChild(gameResultDisplay4);
-    gamePage.appendChild(gameResultDisplay5);
-    gamePage.appendChild(gameResultDisplay6);
-    gamePage.appendChild(gameResultDisplay7);
-    gamePage.appendChild(gameResultDisplay8);
-    // gamePage.appendChild(outputMessages);
-    document.body.appendChild(gamePage);
-  }
-};
-
-// Function that takes in user input + validation for board size
-// and number of squares to win
-const createUserInput = () => {
-  numSquaresInput = document.createElement('input');
-  numSquaresInput.setAttribute('id', 'numSquaresInput');
-  numSquaresInput.setAttribute('placeholder', 'Enter number of squares in a row that makes a win.');
-
-  boardSizeInput = document.createElement('input');
-  boardSizeInput.setAttribute('id', 'boardSizeInput');
-  boardSizeInput.setAttribute('placeholder', 'Enter board size.');
-
-  // displays message on user's input on num of squares
-  numSquaresInputDisplay = document.createElement('div');
-  boardSizeInputDisplay = document.createElement('div');
-  // submit button for numSquaresInput
-  submitNumSquaresBtn = document.createElement('button');
-  submitNumSquaresBtn.innerHTML = 'Submit';
-  submitNumSquaresBtn.setAttribute('id', 'button');
-  submitNumSquaresBtn.addEventListener('click', () => {
-    const input = document.querySelector('#numSquaresInput');
-    if (isNaN(input.value)) {
-      numSquaresInputDisplay.innerHTML = 'Please enter a valid number';
-    } else {
-      numSquaresInputDisplay.innerHTML = `User chose ${input.value} consecutive squares as winning criteria.`;
-      numOfSquares = Number(input.value);
-    }
-  });
-
-  submitBoardSizeBtn = document.createElement('button');
-  submitBoardSizeBtn.innerHTML = 'Submit';
-  submitBoardSizeBtn.setAttribute('id', 'button');
-  submitBoardSizeBtn.addEventListener('click', () => {
-    const input = document.querySelector('#boardSizeInput');
-    if (isNaN(input.value)) {
-      boardSizeInputDisplay.innerHTML = 'Please enter a valid number';
-    } else {
-      boardSizeInputDisplay.innerHTML = `User chose ${input.value} as board size.`;
-      boardSizeInput = Number(input.value);
-    }
-    resetGame();
-    boardSize = boardSizeInput;
-  });
-
-  gamePage.appendChild(numSquaresInput);
-  gamePage.appendChild(submitNumSquaresBtn);
-  gamePage.appendChild(numSquaresInputDisplay);
-
-  gamePage.appendChild(boardSizeInput);
-  gamePage.appendChild(submitBoardSizeBtn);
-  gamePage.appendChild(boardSizeInputDisplay);
-};
-
-// Function that creates the board container element and put it on the screen
-const gameInit = () => {
-  // build the board - right now it's empty
-  // createPositionMatrix for tracking coordinates
-  initPosMatrix();
-  buildBoard();
-  createUserInput();
-  createGameModeSelection();
-  document.body.appendChild(outputMessages);
 };
 
 // Function that switches between 'X' and 'O' after each turn
@@ -299,15 +133,26 @@ const togglePlayerTurn = () => {
   }
 };
 
-// Function that assigns 'X' or 'O' to the position matrix based on the square
-const squareClick = (row, column) => {
-  // Check if the clicked square has been clicked before
-  if (gameWon !== true && posMatrix[row][column] !== 'X' && posMatrix[row][column] !== 'O') {
-    // If not, assign current player's selection into matrix
-    posMatrix[row][column] = currentPlayer;
-    togglePlayer();
-  }
+// Function that creates 'normal' and 'computer' game modes
+const createGameModeSelection = () => {
+  changeGamePlayModeBtn = document.createElement('button');
+  changeGamePlayModeBtn.innerText = gamePlayMode;
+  gamePage.appendChild(changeGamePlayModeBtn);
+
+  // Toggle between 'normal' and 'computer' mode
+  changeGamePlayModeBtn.addEventListener('click', () => {
+    if (gamePlayMode === 'normal') {
+      gamePlayMode = 'computer';
+      console.log(gamePlayMode, 'gamePlayMode');
+    } else if (gamePlayMode === 'computer') {
+      gamePlayMode = 'normal';
+      console.log(gamePlayMode, 'gamePlayMode');
+    }
+    console.log('button pressed');
+    changeGamePlayModeBtn.innerText = gamePlayMode;
+  });
 };
+
 // Function to reset anchor-points to initial co-ordinates
 // Used with checkWin functions
 const resetAnchorPts = () => {
@@ -342,6 +187,31 @@ const trackAnchorPts = (oX, oY, direction, size) => {
     z = oY - (size - 1);
     console.log('z is reset');
   }
+};
+
+// To generate all permutations of possible anchor-points for match-checking
+// in numOfSquares scenario to win (larger than 3x3 permutation grid)
+const createAnchorPts = () => {
+// AnchorPts store the origins for variable numOfSquare game
+  // columns and rows are zero-indexed
+  const rightAnchorPts = [];
+  // To add another anchorPt in the array, increment by 1
+  let i = 0;
+
+  // oX refers to rows
+  // oY refers to column
+  // using oX instead of generic variable document the draw linkage to the oX global variable
+
+  for (let oX = boardSize; oX - numOfSquares >= 0; oX -= 1) {
+    for (let oY = boardSize; oY - numOfSquares >= 0; oY -= 1) {
+      rightAnchorPts.push({});
+      rightAnchorPts[i].point = i + 1;
+      rightAnchorPts[i].column = oX - 1;
+      rightAnchorPts[i].row = oY - 1;
+      i += 1;
+    }
+  }
+  return rightAnchorPts;
 };
 // Function that check for matches vertically or horizontally (in either 'x' or 'y' directions)
 // Input 'horizontal' or  'vertical' to check for matches
@@ -459,31 +329,6 @@ const checkWinZ = (x, y, z, direction, size) => {
       outputValue3 = 'There is no match';
     }
   }
-};
-
-// To generate all permutations of possible anchor-points for match-checking
-// in numOfSquares scenario to win (larger than 3x3 permutation grid)
-const createAnchorPts = () => {
-// AnchorPts store the origins for variable numOfSquare game
-  // columns and rows are zero-indexed
-  const rightAnchorPts = [];
-  // To add another anchorPt in the array, increment by 1
-  let i = 0;
-
-  // oX refers to rows
-  // oY refers to column
-  // using oX instead of generic variable document the draw linkage to the oX global variable
-
-  for (let oX = boardSize; oX - numOfSquares >= 0; oX -= 1) {
-    for (let oY = boardSize; oY - numOfSquares >= 0; oY -= 1) {
-      rightAnchorPts.push({});
-      rightAnchorPts[i].point = i + 1;
-      rightAnchorPts[i].column = oX - 1;
-      rightAnchorPts[i].row = oY - 1;
-      i += 1;
-    }
-  }
-  return rightAnchorPts;
 };
 
 // Function that encapsulates checkWinXY and checkWinZ for numOfSquares scenario
@@ -642,43 +487,215 @@ const computerRandSelect = () => {
     togglePlayer();
   }
 };
-// Function that creates 'normal' and 'computer' game modes
-const createGameModeSelection = () => {
-  changeGamePlayModeBtn = document.createElement('button');
-  changeGamePlayModeBtn.innerText = gamePlayMode;
-  gamePage.appendChild(changeGamePlayModeBtn);
 
-  // Toggle between 'normal' and 'computer' mode
-  changeGamePlayModeBtn.addEventListener('click', () => {
-    if (gamePlayMode === 'normal') {
-      gamePlayMode = 'computer';
-      console.log(gamePlayMode, 'gamePlayMode');
-    } else if (gamePlayMode === 'computer') {
-      gamePlayMode = 'normal';
-      console.log(gamePlayMode, 'gamePlayMode');
+// Function that completely rebuilds the entire board every time there's a click
+const buildBoard = () => {
+  // Initialise overall container that hold
+  // 1)board display and 2) the match-result display elements
+  gamePage = document.createElement('div');
+
+  // Initialise match results for fixed board size games
+  gameResultDisplay1 = document.createElement('div');
+  gameResultDisplay2 = document.createElement('div');
+  gameResultDisplay3 = document.createElement('div');
+  gameResultDisplay4 = document.createElement('div');
+
+  // Initialise match results for variable board size games
+  gameResultDisplay5 = document.createElement('div');
+  gameResultDisplay6 = document.createElement('div');
+  gameResultDisplay7 = document.createElement('div');
+  gameResultDisplay8 = document.createElement('div');
+
+  for (let i = 0; i < boardSize; i += 1) {
+    // Create a row for each horizontal layer of the board
+    const rowElement = document.createElement('div');
+    rowElement.classList.add('row');
+
+    for (let j = 0; j < boardSize; j += 1) {
+      // Create a square for column in the row
+      const square = document.createElement('div');
+      square.classList.add('square');
+
+      // Sets an unique id to each square so 'computer'
+      // can identify and append its selection
+      square.setAttribute('id', `${posMatrix[i][j]}`);
+      rowElement.appendChild(square);
+
+      // Set a click eventListener to each square element
+      // Disabling next-lines for lines below as it seems to be too long apparently
+      // eslint-disable-next-line
+      square.addEventListener('click', () => {
+        // Check number of empty squares left i.e moves
+        movesLeft = getAvailPosArray().length - 1;
+        console.log(movesLeft, 'movesLeft');
+        if (playerTurn === 'player') {
+          squareClick(i, j);
+          if (square.innerText === '') {
+            square.innerText = posMatrix[i][j];
+            outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
+            togglePlayerTurn();
+            console.log(playerTurn, 'playerTurn');
+            computerRandSelect();
+          }
+        }
+        if (square.innerText !== '') {
+          outputMessages.innerText = 'You may not click on the same square again!';
+          // Turn off player-turn display when game ends and output game-over message only
+          const userTurnDisplayRef = setTimeout(() => {
+            if (gameWon === false) {
+              outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
+            } else if (gameWon === true || (gameWon === false && movesLeft === 0)) {
+              clearInterval(userTurnDisplayRef);
+            }
+          }, 2000);
+        }
+
+        // ======================Logic for checking for matches======================//
+        if (!numOfSquares) {
+        // Check from end to end of the board
+        // Check Horizontally
+          resetAnchorPts();
+          trackAnchorPts(x, y, 'horizontal', 'boardSize');
+          checkWinXY(x, y, 'horizontal', boardSize);
+          gameResultDisplay1.innerText = `Checked horizontally: ${outputValue1}`;
+
+          // Check Vertically
+          resetAnchorPts();
+          trackAnchorPts(x, y, 'vertical', 'boardSize');
+          checkWinXY(x, y, 'vertical', boardSize);
+          gameResultDisplay2.innerText = `Checked vertically: ${outputValue1}`;
+
+          // Check Diagonally Left
+          trackAnchorPts(x, y, 'bot-left', boardSize);
+          checkWinZ(x, y, z, 'bot-left', boardSize);
+          gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue3}`;
+
+          // Check Diagonally Ri"ght
+          trackAnchorPts(x, y, 'bot-right', boardSize);
+          checkWinZ(x, y, z, 'bot-right', boardSize);
+          gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue2}`;
+
+          // after checking, if gameWon is true, then restart Game and output relevant message
+          gameOver();
+        } else {
+        // Check for matches if variable numOfSquares are defined
+          checkVarWin();
+          gameOver();
+        }
+      });
     }
-    console.log('button pressed');
-    changeGamePlayModeBtn.innerText = gamePlayMode;
-  });
+    console.log('test2');
+    // add a single row to the board
+    boardContainer.appendChild(rowElement);
+    gamePage.appendChild(boardContainer);
+    gamePage.appendChild(gameResultDisplay1);
+    gamePage.appendChild(gameResultDisplay2);
+    gamePage.appendChild(gameResultDisplay3);
+    gamePage.appendChild(gameResultDisplay4);
+    gamePage.appendChild(gameResultDisplay5);
+    gamePage.appendChild(gameResultDisplay6);
+    gamePage.appendChild(gameResultDisplay7);
+    gamePage.appendChild(gameResultDisplay8);
+    document.body.appendChild(gamePage);
+  }
 };
 
-// ===================MATCHING LOGIC - PATTERNS INVOLVED=========================//
+// Function that takes in user input + validation for board size
+// and number of squares to win
+const createUserInput = () => {
+  numSquaresInput = document.createElement('input');
+  numSquaresInput.setAttribute('id', 'numSquaresInput');
+  numSquaresInput.setAttribute('placeholder', 'Enter number of squares in a row that makes a win.');
+
+  boardSizeInput = document.createElement('input');
+  boardSizeInput.setAttribute('id', 'boardSizeInput');
+  boardSizeInput.setAttribute('placeholder', 'Enter board size.');
+
+  // displays message on user's input on num of squares
+  numSquaresInputDisplay = document.createElement('div');
+  boardSizeInputDisplay = document.createElement('div');
+  // submit button for numSquaresInput
+  submitNumSquaresBtn = document.createElement('button');
+  submitNumSquaresBtn.innerHTML = 'Submit';
+  submitNumSquaresBtn.setAttribute('id', 'button');
+  submitNumSquaresBtn.addEventListener('click', () => {
+    const input = document.querySelector('#numSquaresInput');
+    if (isNaN(input.value)) {
+      numSquaresInputDisplay.innerHTML = 'Please enter a valid number';
+    } else {
+      numSquaresInputDisplay.innerHTML = `User chose ${input.value} consecutive squares as winning criteria.`;
+      numOfSquares = Number(input.value);
+    }
+  });
+
+  submitBoardSizeBtn = document.createElement('button');
+  submitBoardSizeBtn.innerHTML = 'Submit';
+  submitBoardSizeBtn.setAttribute('id', 'button');
+  submitBoardSizeBtn.addEventListener('click', () => {
+    const input = document.querySelector('#boardSizeInput');
+    if (isNaN(input.value)) {
+      boardSizeInputDisplay.innerHTML = 'Please enter a valid number';
+    } else {
+      boardSizeInputDisplay.innerHTML = `User chose ${input.value} as board size.`;
+      boardSizeInput = Number(input.value);
+    }
+    resetGame();
+    boardSize = boardSizeInput;
+  });
+
+  gamePage.appendChild(numSquaresInput);
+  gamePage.appendChild(submitNumSquaresBtn);
+  gamePage.appendChild(numSquaresInputDisplay);
+
+  gamePage.appendChild(boardSizeInput);
+  gamePage.appendChild(submitBoardSizeBtn);
+  gamePage.appendChild(boardSizeInputDisplay);
+};
+
+// Function that assigns 'X' or 'O' to the position matrix based on the square
+const squareClick = (row, column) => {
+  // Check if the clicked square has been clicked before
+  if (gameWon !== true && posMatrix[row][column] !== 'X' && posMatrix[row][column] !== 'O') {
+    // If not, assign current player's selection into matrix
+    posMatrix[row][column] = currentPlayer;
+    togglePlayer();
+  }
+};
+
+// Function that creates the board container element and put it on the screen
+const gameInit = () => {
+  // build the board - right now it's empty
+  // createPositionMatrix for tracking coordinates
+  initPosMatrix();
+  buildBoard();
+  createUserInput();
+  createGameModeSelection();
+  document.body.appendChild(outputMessages);
+};
+
+// ===================MATCHING LOGIC(s) - PATTERNS INVOLVED=========================//
 // CHECKING HORIZONTALLY & VERTICALLY
 // Pattern To Understand for match checking in different sizes
-// NumOfCards (size) level  diff
-// 3                  1     2
-// 4                  2     2
-// 5                  3     2
-// 6                  4     2
+// numOfSquares(size) level  diff
+//        3           1     2
+//        4           2     2
+//        5           3     2
+//        6           4     2
 // This is same for both rows and columns
-// hence initialRow or initialColumn - (size - 2) - This works for checking horizontally as
+// hence initialRow or initialColumn - (size - 2) ==> Works for checking horizontally and vertically
 
 // CHECKING DIAGONALLY
 // For checking diagonally for variable number of squares:
-// For Checking bottom left to bottom right
-// Function is written such that it will always evaluate at the 2nd right highest point i.e 1 position left of its original anchor point. Hence initialCol - 1;
+
+// For checking bottom left to bottom right
+// checkWinZ() is written such that it will always evaluate at the
+// 2nd right highest point i.e 1 position left of its original anchor point. Hence initialCol - 1;
+
 // For checking bottom right to bottom left
-// Fn is written such that it will always evaluate at the 2nd right highest point i.e initialRow - (size - 2); where initialRow is zero-indexed and size is not
+// Fn is written such that it will always evaluate
+// at the 2nd right highest point i.e initialRow - (size - 2);
+// P.S initialRow is zero-indexed and size is not
+// P.S size is an argument that can take on numOfSquares or boardSize (i.e full board)
 
 // =======================EXECUTE GAME=========================//
 gameInit();
