@@ -23,8 +23,8 @@ const posMatrix = [];
 // To track row and column co-ordinates of 'origin' points for matching purposes
 // Consts x and y are the 'origin' points for match-checking in the directions of
 // 'horizontal', 'vertical' and diagonally (starting from) 'bot-right' & 'bot-left'
-const x = boardSize - 1;
-const y = boardSize - 1;
+let x = boardSize - 1;
+let y = boardSize - 1;
 
 // Var z is the starting column co-ordinate used for
 // checking diagonally (starting from) from bot-left to top-right;
@@ -440,9 +440,16 @@ const checkVarSizeWin = () => {
 };
 
 // Function that resets the game by re-initializing certain global varibles
-const resetGame = () => {
+const resetGame = (newBoardSize) => {
   let countDown = 5;
   // reset the relevant global variables to resetGame;
+  if (newBoardSize) {
+    boardSize = newBoardSize;
+  } else {
+    boardSize = 3;
+  }
+  x = boardSize - 1;
+  y = boardSize - 1;
   posMatrix.length = 0;
   gameWon = false;
   winner = '';
@@ -568,7 +575,7 @@ const computerRandSelect = () => {
 const squareClick = (row, column) => {
   // Check if the clicked square has been clicked before
   if (posMatrix[row][column] !== 'X' && posMatrix[row][column] !== 'O') {
-    // If not, assign current player's selection into matrix
+    // If not, assign current player's symbol into matrix
     posMatrix[row][column] = currentPlayer;
     togglePlayerSymbol();
   }
@@ -701,8 +708,7 @@ const createUserInput = () => {
     } else {
       boardSizeInputDisplay.innerHTML = `User chose ${input.value} as board size.`;
       boardSizeInput = Number(input.value);
-      resetGame();
-      boardSize = boardSizeInput;
+      resetGame(boardSizeInput);
     }
   });
 };
