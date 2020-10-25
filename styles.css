@@ -1,3 +1,18 @@
 body{
-  background-color:pink;
+  background-color:mistyrose;
+}
+
+.square{
+  padding:20px 10px 0px ;
+  margin:10px;
+  background-color: palegreen;
+  vertical-align: top;
+  height: 40px; 
+  width:40px;
+  text-align:center;
+  border-radius:8px;
+  border-style: dotted;
+  border-color: rgb(90, 197, 90);
+  font-family: 'Lucida Calligraphy', 'Lucida Grande', Arial, sans-serif;
+  display:inline-block;
 }
