@@ -156,7 +156,7 @@ const createGamePlayModeSelection = () => {
 };
 
 //* ** Anchor-Points ***//
-// For the lack of a better name, Anchor points refer to different possible origin co-ordinates
+// For the lack of a better name, Anchor-points refer to different possible origin co-ordinates
 // for checkWinXY() and checkWinZ() functions to perform their match checks
 // E.g in a 4 by 4 matrix where numOfSquaresToWin is set to 3,
 // there are 4 possible right-anchor points, denoted by *
@@ -171,6 +171,9 @@ const createGamePlayModeSelection = () => {
 // [   ] [ 3 ] [ 3 ] [ 3 ]          [   ] [ 4 ] [ 4 ] [ 4 ]
 // [   ] [ 3 ] [ 3 ] [ *3]          [   ] [ 4 ] [ 4 ] [ 4 ]
 // [   ] [   ] [   ] [   ]          [   ] [ 4 ] [ 4 ] [ *4]
+//
+// Note: that 4 different 3x3 squares are possible within the 4x4 square for checking
+//
 // **** End of Illustration of Anchor-Points ***//
 
 // Function to reset anchor-points to initial co-ordinates (as per createAnchorPts fn)
@@ -238,43 +241,49 @@ const createAnchorPts = () => {
 // x and y are global variables which hold the global co-ordinates
 // note that X refers to the ROW and Y refers to the COLUMN in horizontal mode
 const checkWinXY = (x, y, direction, size) => {
-  // Swap X and Y to check vertically by using intermediate variables
+  // Swap x and y to toggle between checking horizontally
+  // and vertically by using intermediate variables
   let a;
   let b;
   let c;
   let d;
 
   if (direction === 'horizontal') {
+    // x is row
     a = x;
+    // y is col
     b = y - 1;
     c = x;
     d = y;
   } else if (direction === 'vertical') {
+    // x is col
     a = x - 1;
+    // y is row
     b = y;
     c = y;
     d = x;
   }
-  // We begin the horizontal and vertical checks from the last co-ordinate (bottom right)
-  // if it is equal to the box on its immediate left
-  // Comments are written for the case of checking horizontally
+  // Illustration are written for the case of checking horizontally (swap x and y for vertical)
+  // Begin the horizontal checks from the origin (bottom-right most co-ordinate)
+  // then check if it is equal to the box on its immediate left
+
   // Scenario 1: if the bottom 2 right boxes are not the same,
   // go up 1 row and re-evaluate the 2 right most boxes
 
   if (posMatrix[x][y] !== posMatrix[a][b] && c >= initialRow - (size - 1)) {
-    // In the event we reached the last row where x is 0
-    if (c === initialRow - (size - 1)) { // c === 0
-      // As long as right pointer is not pointing at the 2nd last box
-      // Continue to check the same row's for matches, starting from the 2 right most boxes
-      // BASE CASE: Once we reached the top left 2 boxes where y === 1
-      // implicitly there is no match and hence no winner
-      if (d === initialCol - (size - 2)) { // d===1
+    // In the event we reached the last row where x === 0
+    if (c === initialRow - (size - 1)) {
+      // And the 2 right boxes are not the same, we arrived at our base case
+      // BASE CASE: Once we reached the top left 2 boxes where y === 1 and y-1 === 0
+      // Implicitly there is no match and hence no winner
+      if (d === initialCol - (size - 2)) {
         console.log('no winner');
         outputValue1 = 'There is no winner';
         return outputValue1;
       }
-      // Otherwise where y > 1, shift the pointer 1 box to the left and check for matches
-      // Otherwise, go up one row and start from the most right position and check for }}matches
+
+      // Otherwise if not at the last row yet,
+      // Traverse up one row and check the 2 right most squares again
     } else {
       if (direction === 'horizontal') {
         x -= 1;
@@ -286,10 +295,11 @@ const checkWinXY = (x, y, direction, size) => {
       checkWinXY(x, y, direction, size);
     }
 
-    // Scenario 2, if 2 consecutive boxes match (regardless of where in the row)
+    // Scenario 2: if 2 consecutive boxes match at a certain row
   } else if (posMatrix[x][y] === posMatrix[a][b] && d >= initialCol - (size - 2)) {
-    // And if the 2 left most boxes are being compared,
-    // implicitly means that the whole row is matched - hence the winner
+    // And if the left 2 most squares are being compared
+    // with left most boundary defined by either boardSize or numOfSquaresToWin.
+    // This implicitly means that the 'whole' row is matched - hence it is a winner
     if (d === initialCol - (size - 2)) { // d === 1
       console.log(`Player ${posMatrix[a][b]} has won!`);
       winner = `${posMatrix[a][b]}`;
@@ -297,8 +307,9 @@ const checkWinXY = (x, y, direction, size) => {
       outputValue1 = `Player ${posMatrix[a][b]} has won!`;
       outputValue4 = `Player ${posMatrix[a][b]} has won!`;
       return outputValue1;
-    } // Otherwise, shift the pointer 1 left
-    // and check for matches for the next consecutive 2 box
+    }
+    // If not at the left 2 most squares, shift the column (pointer) 1 position left
+    // and check for matches for the next consecutive left 2 squares
     if (direction === 'horizontal') {
       y -= 1;
     } else {
@@ -311,10 +322,12 @@ const checkWinXY = (x, y, direction, size) => {
 
 // Function that checks for matches diagonally (in 'z' direction)
 const checkWinZ = (x, y, z, direction, size) => {
-  // using X and Y at initialization implies starting to check from the bottom right hand corner
+  // using x and y at initialization implies starting to check from the bottom right hand corner
   if (direction === 'bot-right') {
     if (posMatrix[x][y] === posMatrix[x - 1][y - 1]) {
-      if (x === initialRow - (size - 2) && y === initialCol - (size - 2)) { // (x === 1 && y === 1)
+      // Refer to extra game logic at end of script
+      // for more info on defining x and y boundaries
+      if (x === initialRow - (size - 2) && y === initialCol - (size - 2)) {
         console.log(`Player ${posMatrix[x][y]} has won!`);
         winner = `${posMatrix[x][y]}`;
         gameWon = true;
@@ -328,10 +341,12 @@ const checkWinZ = (x, y, z, direction, size) => {
 
       checkWinZ(x, y, z, direction, size);
     }
-    // Start matching from the left
+    // Start matching from the bottom - left to top-right
   } else if (direction === 'bot-left') {
     if (posMatrix[x][z] === posMatrix[x - 1][z + 1]) {
-      if (x === initialRow - (size - 2) && z === initialCol - 1) { // x === 1 & z === 1
+      // Refer to extra game logic at end of script
+      // for more info on defining x and y boundaries
+      if (x === initialRow - (size - 2) && z === initialCol - 1) {
         winner = `${posMatrix[x][z]}`;
         gameWon = true;
         console.log(`Player ${posMatrix[x][z]} has won!`);
@@ -343,7 +358,8 @@ const checkWinZ = (x, y, z, direction, size) => {
       z += 1;
       checkWinZ(x, y, z, direction, size);
     } else {
-      // 2 different outputvalues are required so that it does not conflict
+      // Stop gap measure to have 2 different outputvalues
+      // due to bug when displaying to Fixed and Variable square games
       console.log('no winner');
       outputValue2 = 'There is no match';
       outputValue3 = 'There is no match';
@@ -353,8 +369,7 @@ const checkWinZ = (x, y, z, direction, size) => {
 
 // Function that encapsulates checkWinXY and checkWinZ for fixed boardSize scenario
 const checkFixSizeWin = () => {
-// Check from end to end of the board
-  // Check Horizontally
+// Check Horizontally
   resetAnchorPts();
   trackAnchorPts(x, y, 'horizontal', 'boardSize');
   checkWinXY(x, y, 'horizontal', boardSize);
@@ -371,7 +386,7 @@ const checkFixSizeWin = () => {
   checkWinZ(x, y, z, 'bot-left', boardSize);
   gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue3}`;
 
-  // Check Diagonally Ri"ght
+  // Check Diagonally Right
   trackAnchorPts(x, y, 'bot-right', boardSize);
   checkWinZ(x, y, z, 'bot-right', boardSize);
   gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue2}`;
