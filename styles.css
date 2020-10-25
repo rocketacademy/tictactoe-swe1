@@ -16,3 +16,10 @@ body{
   font-family: 'Lucida Calligraphy', 'Lucida Grande', Arial, sans-serif;
   display:inline-block;
 }
+
+
+
+.common-margin{
+  margin-bottom: 20px;
+  margin-right: 10px;
+}

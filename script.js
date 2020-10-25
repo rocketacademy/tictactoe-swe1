@@ -1,9 +1,7 @@
 // keep data about the game in a 2-D array
-const completeBoard = [
-  ['', '', ''],
-  ['', '', ''],
-  ['', '', ''],
-];
+const completeBoard = [];
+// To store the board size
+let inputBoardSize = 0;
 
 // the element that contains the rows and squares
 let boardElement = null;
@@ -12,6 +10,8 @@ let boardElement = null;
 let boardContainer = null;
 // Element to display the game status message
 let divDisplayStatus = null;
+// Input element for entering the player name
+let inputBoardSizeElement = null;
 
 // current player global starts at X
 let currentPlayer = 'X';
@@ -177,32 +177,75 @@ const buildBoard = (board) => {
   }
 };
 
+// To create a completely new array for board
+const createCompleteBoard = (boardSize) => {
+  // This is to check whether there is a need to create new array
+  // or just need to reset the existing data in it.
+  if ((completeBoard.length !== 0) && (completeBoard.length === boardSize)) {
+    for (let idxRow = 0; idxRow < completeBoard.length; idxRow += 1)
+    {
+      for (let idxCol = 0; idxCol < completeBoard.length; idxCol += 1)
+      {
+        completeBoard[idxRow][idxCol] = '';
+      }
+    }
+    return;
+  }
+  // An entire new array needs to be created
+  completeBoard.length = 0;
+  for (let idxRow = 0; idxRow < boardSize; idxRow += 1)
+  {
+    completeBoard.push([]);
+    for (let idxCol = 0; idxCol < boardSize; idxCol += 1)
+    {
+      completeBoard[idxRow].push('');
+    }
+  }
+};
+
 // Function that resets the game to the intial stage
 const resetGame = () => {
   console.log('reset');
   currentPlayer = 'X';
   setDisplayStatus('');
-  boardContainer.innerHTML = '';
-  for (let idxRow = 0; idxRow < completeBoard.length; idxRow += 1)
-  {
-    for (let idxCol = 0; idxCol < completeBoard[idxRow].length; idxCol += 1)
-    {
-      completeBoard[idxRow][idxCol] = '';
-    }
-  }
+  // recreate the board with existing size
+  createCompleteBoard(completeBoard.length);
+  buildBoard(completeBoard);
+};
+
+// Function to handle the click on the Submit Size button.
+// It stores the value of board size and builds the complete board
+const onClickSubmitSizeButton = () => {
+  inputBoardSize = inputBoardSizeElement.value;
+  createCompleteBoard(inputBoardSize);
+  // Build the entire board - right now it's empty
   buildBoard(completeBoard);
 };
 
 // Game intialization
 const gameInit = () => {
+  // Section to handle the inputs received from user any
+  const divInputElements = document.createElement('div');
+  inputBoardSizeElement = document.createElement('input');
+  inputBoardSizeElement.setAttribute('type', 'number');
+  inputBoardSizeElement.required = true;
+  inputBoardSizeElement.setAttribute('placeholder', 'Enter size of board:');
+  inputBoardSizeElement.classList.add('common-margin');
+  divInputElements.appendChild(inputBoardSizeElement);
+  document.body.appendChild(divInputElements);
+
+  // Button to submit the size
+  const inputSizeSubmitButton = document.createElement('button');
+  inputSizeSubmitButton.innerText = 'Submit Board Size';
+  inputSizeSubmitButton.classList.add('common-margin');
+  inputSizeSubmitButton.addEventListener('click', onClickSubmitSizeButton);
+  divInputElements.appendChild(inputSizeSubmitButton);
+
   boardContainer = document.createElement('div');
   document.body.appendChild(boardContainer);
 
   divDisplayStatus = document.createElement('div');
   document.body.appendChild(divDisplayStatus);
-
-  // Build the entire board - right now it's empty
-  buildBoard(completeBoard);
 };
 
 gameInit();
