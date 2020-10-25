@@ -2,7 +2,7 @@
 
 // -------------------------------- General ------------------------------//
 // Set boardSize for TTT - can be reassigned by player in-game
-let boardSize = 4;
+let boardSize = 5;
 
 // Track whether game is won or not
 let gameWon = false;
@@ -620,11 +620,10 @@ const buildBoard = () => {
       // eslint-disable-next-line no-loop-func
       square.addEventListener('click', () => {
         // Check number of available squares left i.e moves
-        movesLeft = getAvailPosArray().length - 1;
-        console.log(movesLeft, 'movesLeft');
-
         if (playerTurn === 'player') {
           squareClick(i, j);
+          // Update latest moves left after player makes his move
+          movesLeft = getAvailPosArray().length;
           if (square.innerText === '') {
             if (gameWon === false) {
               console.log(posMatrix[i][j]);
@@ -636,6 +635,8 @@ const buildBoard = () => {
               console.log(playerTurn, 'playerTurn');
               // Function implicitly checks if playerTurn is 'computer', computer chooses
               computerRandSelect();
+              // Update latest moves left after com makes its move
+              movesLeft = getAvailPosArray().length;
             } else {
               outputMessages.innerText = 'Please wait for game to restart...';
             }
@@ -644,10 +645,11 @@ const buildBoard = () => {
           outputMessages.innerText = 'You cannot click on this square again!';
           // Turn off player-turn display when game ends and output game-over message only
           const userTurnDisplayRef = setTimeout(() => {
-            if (gameWon === false) {
-              outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
-            } else if (gameWon === true || (gameWon === false && movesLeft === 0)) {
+            if (gameWon === true || (gameWon === false && movesLeft === 0)) {
               clearInterval(userTurnDisplayRef);
+              resetGame();
+            } else if (gameWon === false) {
+              outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
             }
           }, 2000);
         }
