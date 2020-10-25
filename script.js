@@ -4,7 +4,8 @@ let boardSize = 3;
 
 // keep data about the game in a 2-D array
 const board = [];
-// a matrix used for checking matches horizontally
+
+// A separate position matrix for checking positions of matches separately
 const posMatrix = [];
 
 // the element that contains the rows and squares
@@ -17,13 +18,13 @@ let winner = '';
 // Game display page
 let gamePage;
 
-// Global variables for various displays and outputValues
+// Global variables for full boardSize scenario displays and outputValues
 let gameResultDisplay1;
 let gameResultDisplay2;
 let gameResultDisplay3;
 let gameResultDisplay4;
 
-// For displaying variable game results
+// For displaying numOfSquares game results
 let gameResultDisplay5;
 let gameResultDisplay6;
 let gameResultDisplay7;
@@ -56,6 +57,12 @@ let boardSizeInputDisplay;
 let numOfSquares = numSquaresInput;
 
 let currentPlayer = 'X';
+
+// Toggle computer-play mode;
+let gamePlayModeBtn;
+let gamePlayMode = 'normal'; // or computer
+let playerTurn = 'player';
+
 // the element that contains the entire board
 // we can empty it out for convenience
 const boardContainer = document.createElement('div');
@@ -114,23 +121,33 @@ const buildBoard = () => {
       // one square element
       const square = document.createElement('div');
       square.classList.add('square');
-
+      square.setAttribute('id', `${posMatrix[i][j]}`);
       // set the text of the square according to the array
-
       rowElement.appendChild(square);
 
       // set the click all over again
       // eslint-disable-next-line
       square.addEventListener('click', () => {
-        squareClick(i, j);
-
-        if (square.innerText === '') {
-          square.innerText = posMatrix[i][j];
-          outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
-        } else if (square.innerText !== '') {
-          outputMessages.innerText = 'You may not click on the same square again!';
-          setTimeout(() => {
+        if (playerTurn === 'player') {
+          squareClick(i, j);
+          if (square.innerText === '') {
+            square.innerText = posMatrix[i][j];
             outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
+            togglePlayerTurn();
+            console.log(playerTurn, 'playerTurn');
+            computerRandSelect();
+          }
+        }
+        if (square.innerText !== '') {
+          outputMessages.innerText = 'You may not click on the same square again!';
+
+          // Turn off player turn display when game ends and output gameover message only
+          const userTurnDisplayRef = setTimeout(() => {
+            if (gameWon === false) {
+              outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
+            } else {
+              clearInterval(userTurnDisplayRef);
+            }
           }, 2000);
         }
 
@@ -154,7 +171,7 @@ const buildBoard = () => {
           checkWinZ(x, y, z, 'bot-left', boardSize);
           gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue3}`;
 
-          // Check Diagonally Right
+          // Check Diagonally Ri"ght
           trackAnchorPoints(x, y, 'bot-right', boardSize);
           checkWinZ(x, y, z, 'bot-right', boardSize);
           gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue2}`;
@@ -243,6 +260,7 @@ const gameInit = () => {
   createPosMatrix();
   buildBoard();
   createUserInput();
+  createGameModeSelection();
   document.body.appendChild(outputMessages);
 };
 
@@ -252,6 +270,15 @@ const togglePlayer = () => {
     currentPlayer = 'O';
   } else {
     currentPlayer = 'X';
+  }
+};
+const togglePlayerTurn = () => {
+  if (gamePlayMode === 'computer') {
+    if (playerTurn === 'player') {
+      playerTurn = 'computer';
+    } else {
+      playerTurn = 'player';
+    }
   }
 };
 
@@ -463,7 +490,7 @@ const checkVarWin = () => {
 };
 
 const resetGame = () => {
-  let countDown = 5;
+  let countDown = 3;
   // reset the arrays;
   board.length = 0;
   posMatrix.length = 0;
@@ -492,10 +519,101 @@ const resetGame = () => {
 
 const gameOver = () => {
   if (gameWon === true) {
-    resetGame();
     console.log(winner, 'winner');
     outputMessages.innerText = `Game over! Player ${winner} wins!`;
+    setTimeout(() => {
+      resetGame();
+    }, 2000);
   }
+};
+
+// Computer Player 1
+
+// Generate an array of all possible empty positions in posMatrix
+const getAvailPosArray = () => {
+  let availPosArray = [];
+  let removed = [];
+  availPosArray = posMatrix.flat();
+  let i = 0;
+  while (i < availPosArray.length) {
+    if (availPosArray[i] === 'X' || availPosArray[i] === 'O') {
+      removed = availPosArray.splice(i, 1);
+      console.log('removed', removed);
+      i = 0;
+    } else {
+      i += 1;
+    }
+  }
+
+  console.log(availPosArray);
+  return availPosArray;
+};
+
+// random num generator to randomly select a position within the posMatrix
+const randNumGen = (length) => Math.floor(Math.random() * length);
+
+const computerRandSelect = () => {
+  if (playerTurn === 'computer') {
+    console.log(posMatrix, 'before'); // why does this posMatrix also show the post-result of calling randPositionSelector?
+    // Get a flat array of string-number labeled positions that corresponds to the posMatrix
+    const availPosArray = getAvailPosArray();
+    // Randomly select one of the string-number labeled positions in posMatrix by first
+    // selecting a random index that correspond to the string-number
+    const indexOfRandPosition = randNumGen(availPosArray.length);
+    // The string-number is then reproduced as chosenPosition
+    const chosenPosition = availPosArray[indexOfRandPosition];
+    console.log(chosenPosition, 'chosenPosition');
+
+    // Loop through the posMatrix and insert in computer's choice
+    let i = 0;
+    let row;
+    let col;
+    while (i < posMatrix.length) {
+      col = posMatrix[i].findIndex((element) => {
+        if (element === chosenPosition) {
+          return true;
+        }
+        return false;
+      });
+
+      if (col === -1) {
+        i += 1;
+      } else if (col !== -1) {
+        row = i;
+        break;
+      }
+    }
+    console.log(row, 'row');
+    console.log(col, 'col');
+    console.log(posMatrix, 'after');
+
+    const squarePos = posMatrix[row][col];
+    const computerChosenSquare = document.getElementById(squarePos);
+    posMatrix[row][col] = currentPlayer;
+    computerChosenSquare.innerText = currentPlayer;
+    // Change back to Player's turn
+    togglePlayerTurn();
+    togglePlayer();
+  }
+};
+
+const createGameModeSelection = () => {
+  gamePlayModeBtn = document.createElement('button');
+  gamePlayModeBtn.innerText = gamePlayMode;
+  gamePage.appendChild(gamePlayModeBtn);
+
+  // Toggle between normal and computer mode
+  gamePlayModeBtn.addEventListener('click', () => {
+    if (gamePlayMode === 'normal') {
+      gamePlayMode = 'computer';
+      console.log(gamePlayMode, 'gamePlayMode');
+    } else if (gamePlayMode === 'computer') {
+      gamePlayMode = 'normal';
+      console.log(gamePlayMode, 'gamePlayMode');
+    }
+    console.log('button pressed');
+    gamePlayModeBtn.innerText = gamePlayMode;
+  });
 };
 
 // ===================MATCHING LOGIC - PATTERNS INVOLVED=========================//
