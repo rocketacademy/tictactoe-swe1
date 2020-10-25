@@ -15,6 +15,8 @@ let inputBoardSizeElement = null;
 
 // current player global starts at X
 let currentPlayer = 'X';
+// A variable to indicate whether game is over or not
+let gameOver = false;
 
 // switch the global values from one player to the next
 const togglePlayer = () => {
@@ -118,7 +120,7 @@ const squareClick = (row, column) => {
   console.log('coordinates', row, column);
 
   // see if the clicked square has been clicked on before
-  if (completeBoard[row][column] === '') {
+  if (completeBoard[row][column] === '' && !gameOver) {
     // alter the data array, set it to the current player
     completeBoard[row][column] = currentPlayer;
     // refresh the screen with a new board
@@ -127,6 +129,7 @@ const squareClick = (row, column) => {
     buildBoard(completeBoard);
     if (checkWin(completeBoard))
     {
+      gameOver = true;
       setDisplayStatus(`Game over. ${currentPlayer} wins!!. Resetting the Game...`);
       setTimeout(() => {
         // eslint disables as resetGame used the function buildBoard
@@ -211,15 +214,19 @@ const resetGame = () => {
   // recreate the board with existing size
   createCompleteBoard(completeBoard.length);
   buildBoard(completeBoard);
+  gameOver = false;
 };
 
 // Function to handle the click on the Submit Size button.
 // It stores the value of board size and builds the complete board
 const onClickSubmitSizeButton = () => {
   inputBoardSize = inputBoardSizeElement.value;
+  setDisplayStatus('Board size changed.');
   createCompleteBoard(inputBoardSize);
   // Build the entire board - right now it's empty
   buildBoard(completeBoard);
+  gameOver = false;
+  // setDisplayStatus('');
 };
 
 // Game intialization
