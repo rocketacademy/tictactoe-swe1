@@ -316,7 +316,6 @@ const checkWinXY = (x, y, direction, size) => {
 };
 
 // Function that checks for matches diagonally (in 'z' direction)
-
 /**
  *
  * @param {Number} x - refers the global variable that is row of the right-most origin co-ordinate
