@@ -117,7 +117,7 @@ const initPosMatrix = () => {
 };
 
 // Function that switches between 'X' and 'O' after each turn
-const togglePlayer = () => {
+const togglePlayerSymbol = () => {
   if (currentPlayer === 'X') {
     currentPlayer = 'O';
   } else {
@@ -133,6 +133,8 @@ const togglePlayerTurn = () => {
     } else {
       playerTurn = 'player';
     }
+  } else {
+    playerTurn = 'player';
   }
 };
 
@@ -176,12 +178,6 @@ const createGamePlayModeSelection = () => {
 //
 // **** End of Illustration of Anchor-Points ***//
 
-// Function to reset anchor-points to initial co-ordinates (as per createAnchorPts fn)
-// Used with checkWin functions
-const resetAnchorPts = () => {
-  initialRow = '';
-  initialCol = '';
-};
 // Function that tracks every possible anchor-points
 // oX and oY are right-most anchor-points of each possible square depending on 'numOfSquaresToWin'
 // z is the left most col value depending on 'numOfSquaresToWin'
@@ -287,26 +283,24 @@ const checkWinXY = (x, y, direction, size) => {
         outputValue1 = 'There is no winner';
         return outputValue1;
       }
-
       // Otherwise if not at the last row yet,
       // Traverse up one row and check the 2 right most squares again
     } else {
       if (direction === 'horizontal') {
         x -= 1;
-        y = size - 1;
+        y = initialCol;
       } else {
         y -= 1;
-        x = size - 1;
+        x = initialCol;
       }
       checkWinXY(x, y, direction, size);
     }
-
     // Scenario 2: if 2 consecutive boxes match at a certain row
   } else if (posMatrix[x][y] === posMatrix[a][b] && d >= initialCol - (size - 2)) {
     // And if the left 2 most squares are being compared
     // with left most boundary defined by either boardSize or numOfSquaresToWin.
     // This implicitly means that the 'whole' row is matched - hence it is a winner
-    if (d === initialCol - (size - 2)) { // d === 1
+    if (d === initialCol - (size - 2)) {
       console.log(`Player ${posMatrix[a][b]} has won!`);
       winner = `${posMatrix[a][b]}`;
       gameWon = true;
@@ -389,7 +383,6 @@ const checkWinZ = (x, y, z, direction, size) => {
 // Function that encapsulates checkWinXY and checkWinZ for fixed boardSize scenario
 const checkFixSizeWin = () => {
   // Check Horizontally
-
   // Track or (swap) the initialRow and initialCol depending on the direction checked
   // for each anchor-point
   trackAnchorPts(x, y, 'horizontal', 'boardSize');
@@ -414,42 +407,41 @@ const checkFixSizeWin = () => {
 
 // Function that encapsulates checkWinXY and checkWinZ for 'numOfSquaresToWin' scenario
 const checkVarSizeWin = () => {
-// Create the initial set of anchor points
+// Create the initial set of anchor-points
   const rightAnchorPts = createAnchorPts();
   console.log(rightAnchorPts);
 
-  // Go through each of the possible right anchor points and check for matches in XY direction
+  // Go through each of the possible right anchor-points and check for matches in XY direction
   for (let i = 0; i < rightAnchorPts.length; i += 1) {
-    const x = rightAnchorPts[i].row;
-    const y = rightAnchorPts[i].column;
-    // column - (size-1) ['numOfSquaresToWin' is already 0 indexed];
-    z = y - (numOfSquaresToWin - 1);
+    const oX = rightAnchorPts[i].row;
+    const oY = rightAnchorPts[i].column;
+    // z =  column - (size-1) ['numOfSquaresToWin' is already 0 indexed];
+    z = oY - (numOfSquaresToWin - 1);
 
-    // //Check Horizontally
-    resetAnchorPts();
-    trackAnchorPts(x, y, 'horizontal', numOfSquaresToWin);
-    checkWinXY(x, y, 'horizontal', numOfSquaresToWin);
-    gameResultDisplay5.innerText = `Var Cards - Checked horizontally: ${outputValue4}`;
-    // // Check Vertically
-    resetAnchorPts();
-    trackAnchorPts(x, y, 'vertical', numOfSquaresToWin);
-    checkWinXY(x, y, 'vertical', numOfSquaresToWin);
-    gameResultDisplay6.innerText = `Var Cards -Checked vertically: ${outputValue4}`;
+    // Check Horizontally
+    trackAnchorPts(oX, oY, 'horizontal', numOfSquaresToWin);
+    checkWinXY(oX, oY, 'horizontal', numOfSquaresToWin);
+    gameResultDisplay5.innerText = `Var Cards - Check horizontally: ${outputValue4}`;
+
+    // Check Vertically
+    trackAnchorPts(oX, oY, 'vertical', numOfSquaresToWin);
+    checkWinXY(oX, oY, 'vertical', numOfSquaresToWin);
+    gameResultDisplay6.innerText = `Var Cards - Check vertically: ${outputValue4}`;
 
     // Check Diagonally
-    trackAnchorPts(x, y, 'bot-left', numOfSquaresToWin);
-    checkWinZ(x, y, z, 'bot-left', numOfSquaresToWin);
-    gameResultDisplay7.innerText = `Var Cards -Check top-left to bottom-right diagonally: ${outputValue5}`;
+    trackAnchorPts(oX, oY, 'bot-left', numOfSquaresToWin);
+    checkWinZ(oX, oY, z, 'bot-left', numOfSquaresToWin);
+    gameResultDisplay7.innerText = `Var Cards - Check bottom-right to top-left diagonally: ${outputValue5}`;
 
-    trackAnchorPts(x, y, 'bot-right', numOfSquaresToWin);
-    checkWinZ(x, y, z, 'bot-right', numOfSquaresToWin);
-    gameResultDisplay8.innerText = `Var Cards -Check top-right to bottom-left diagonally: ${outputValue6}`;
+    trackAnchorPts(oX, oY, 'bot-right', numOfSquaresToWin);
+    checkWinZ(oX, oY, z, 'bot-right', numOfSquaresToWin);
+    gameResultDisplay8.innerText = `Var Cards - Check bottom-right to top-left diagonally: ${outputValue6}`;
   }
 };
 
 // Function that resets the game by re-initializing certain global varibles
 const resetGame = () => {
-  let countDown = 10;
+  let countDown = 5;
   // reset the relevant global variables to resetGame;
   posMatrix.length = 0;
   gameWon = false;
@@ -568,17 +560,17 @@ const computerRandSelect = () => {
     // Switch back to Player's turn
     togglePlayerTurn();
     // Switch back to Player's symbol- either 'X' or 'O'
-    togglePlayer();
+    togglePlayerSymbol();
   }
 };
 
 // Function that assigns 'X' or 'O' to the position matrix based on the square clicked
 const squareClick = (row, column) => {
   // Check if the clicked square has been clicked before
-  if (gameWon !== true && posMatrix[row][column] !== 'X' && posMatrix[row][column] !== 'O') {
+  if (posMatrix[row][column] !== 'X' && posMatrix[row][column] !== 'O') {
     // If not, assign current player's selection into matrix
     posMatrix[row][column] = currentPlayer;
-    togglePlayer();
+    togglePlayerSymbol();
   }
 };
 
@@ -623,16 +615,21 @@ const buildBoard = () => {
         // Check number of available squares left i.e moves
         movesLeft = getAvailPosArray().length - 1;
         console.log(movesLeft, 'movesLeft');
+
         if (playerTurn === 'player') {
           squareClick(i, j);
           if (square.innerText === '') {
+            console.log(posMatrix[i][j]);
             square.innerText = posMatrix[i][j];
             outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
+            // Function implicitly checks if gamePlayMode is true, if yes, then switch to 'computer'
             togglePlayerTurn();
             console.log(playerTurn, 'playerTurn');
+            // Function implicitly checks if playerTurn is 'computer', computer chooses
             computerRandSelect();
           }
         }
+
         if (square.innerText !== '') {
           outputMessages.innerText = 'You may not click on the same square again!';
           // Turn off player-turn display when game ends and output game-over message only
@@ -644,11 +641,12 @@ const buildBoard = () => {
             }
           }, 2000);
         }
+
         // Check for matches in scenario across the whole board
-        // if variable squares to win is not defined
+        // if num of squares to win is not defined
         if (!numOfSquaresToWin) {
           checkFixSizeWin();
-          // after checking, if gameWon is true, restart Game and output relevant message
+          // after checking, if gameWon is true, restart game and output relevant message
           checkIfGameOver();
         } else {
         // Check for matches if variable squares to win is defined
@@ -657,14 +655,13 @@ const buildBoard = () => {
         }
       });
     }
-    console.log('test2');
     // add a single row to the board
     boardContainer.appendChild(rowElement);
   }
 };
 
-// Function that takes in user input + validation for board size
-// and number of squares to win
+// Function that creates user input, buttons and performs validation on
+// and number of squares to win and board size
 const createUserInput = () => {
   numSquaresInput = document.createElement('input');
   numSquaresInput.setAttribute('id', 'numSquaresInput');
@@ -701,9 +698,9 @@ const createUserInput = () => {
     } else {
       boardSizeInputDisplay.innerHTML = `User chose ${input.value} as board size.`;
       boardSizeInput = Number(input.value);
+      resetGame();
+      boardSize = boardSizeInput;
     }
-    resetGame();
-    boardSize = boardSizeInput;
   });
 };
 
@@ -714,7 +711,7 @@ const gameInit = () => {
   createUserInput();
   createGamePlayModeSelection();
 
-  // Appending all children html here
+  // Appending all children of gamePage here
   gamePage.appendChild(boardContainer);
 
   gamePage.appendChild(gameResultDisplay1);
@@ -745,7 +742,7 @@ const gameInit = () => {
 // ===================================EXECUTE GAME=================================//
 gameInit();
 
-// ===================EXTRA-INFO ON MATCHING LOGIC(s)[WIP]=========================//
+// ===================[WIP]EXTRA-INFO ON MATCHING LOGIC(s)[WIP]=========================//
 //
 // ******************* CHECKING HORIZONTALLY & VERTICALLY**************************//
 // Pattern To Understand for match checking in different sizes
@@ -766,7 +763,7 @@ gameInit();
 
 // For checking from bottom right to top left (i.e bot-left):
 // checkWinZ() is written such that it will always evaluate at the
-// 2nd right highest point i.e 1 position left of its original anchor point. Hence initialCol - 1;
+// 2nd right highest point i.e 1 position left of its original anchor-point. Hence initialCol - 1;
 
 // For checking bottom left to top right (i.e bot-right):
 // checkWinZ() is written such that it will always evaluate at the
