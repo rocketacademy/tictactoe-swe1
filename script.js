@@ -13,10 +13,11 @@ let winner = '';
 // Tracks current player, either X or O
 let currentPlayer = 'X';
 
-// -------------------Co-ordinates Tracking &  Management-----------------//
+// ------------------- Co-ordinates Tracking &  Management----------------//
 
-// Declares a matrix that tracks the positions of empty,X and O squares
-// of the board for matching purposes
+// Declares a matrix that tracks the positions of available,'X' and 'O' squares
+// on the board for matching purposes. Available positions are represented by
+// string-numbers
 const posMatrix = [];
 
 // To track row and column co-ordinates of 'origin' points for matching purposes
@@ -27,10 +28,10 @@ const y = boardSize - 1;
 
 // Var z is the starting column co-ordinate used for
 // checking diagonally (starting from) from bot-left to top-right;
-// Can be recalculated depending on size either size of board or num of squares to win
+// Can be recalculated depending on either 'boardSize' or 'numOfSquaresToWin'
 let z = 0;
 
-// Tracks initial anchor-points (origins) for numOfSquaresToWin
+// Tracks initial anchor-points (origins) for 'numOfSquaresToWin'
 // Variables initialRow and initialCol are zero-indexed
 let initialRow;
 let initialCol;
@@ -48,16 +49,17 @@ let playerTurn = 'player';
 let movesLeft;
 
 // ---------------------------HTML Elements ------------------------------//
-// To display miscellaneous messages such as game over, restarting game etc.
-// To be accessible across multiple functions such as gameOver() and resetGame()
-const outputMessages = document.createElement('div');
-outputMessages.innerText = 'Please input number of squares or if blank, play the full board size. \nPlayer X begins first.';
+
+// Game display div that contains the boardContainer and all other html elements
+let gamePage;
 
 // The element that contains the entire board
 const boardContainer = document.createElement('div');
 
-// Game display page
-let gamePage;
+// To display miscellaneous messages such as game over, restarting game etc.
+// To be accessible across multiple functions such as gameOver() and resetGame()
+const outputMessages = document.createElement('div');
+outputMessages.innerText = 'Please input number of squares or if blank, play the full board size. \nPlayer X begins first.';
 
 // Display matches, if any for full boardSize game scenario
 let gameResultDisplay1;
@@ -65,32 +67,32 @@ let gameResultDisplay2;
 let gameResultDisplay3;
 let gameResultDisplay4;
 
-// Display matches, if any for variable boardSize (aka numOfSquaresToWin) game scenario
+// Display matches, if any for variable boardSize (aka 'numOfSquaresToWin') game scenario
 let gameResultDisplay5;
 let gameResultDisplay6;
 let gameResultDisplay7;
 let gameResultDisplay8;
 
 // Display of the results after checking
-// for matches for scenario of fixed BoardSize
-let outputValue1;
-let outputValue2;
-let outputValue3;
+// for matches in scenario of fixed BoardSize
+let outputValue1 = 'There is no match';
+let outputValue2 = 'There is no match';
+let outputValue3 = 'There is no match';
 
-// Display of the results after checking for matches
-// for scenario of variable numOfSquaresToWin
-let outputValue4;
-let outputValue5;
-let outputValue6;
+// Display of the results after checking
+// for matches in scenario of variable 'numOfSquaresToWin'
+let outputValue4 = 'There is no match';
+let outputValue5 = 'There is no match';
+let outputValue6 = 'There is no match';
 
-// Tracks user input on desired numOfSquaresToWin to win
+// Tracks user input on desired 'numOfSquaresToWin' to win
 let numSquaresInput;
 
 // Refers to player's discretionary number of squares in a row as
 // criteria for game to be won
 let numOfSquaresToWin = numSquaresInput;
 
-// Tracks user input on desired board size to play
+// Tracks user input on desired board size to play [WIP: buggy]
 let boardSizeInput;
 
 let submitNumSquaresBtn;
@@ -135,10 +137,9 @@ const togglePlayerTurn = () => {
 };
 
 // Function that creates 'normal' and 'computer' in gamePlayMode
-const createGameModeSelection = () => {
+const createGamePlayModeSelection = () => {
   changeGamePlayModeBtn = document.createElement('button');
   changeGamePlayModeBtn.innerText = gamePlayMode;
-  gamePage.appendChild(changeGamePlayModeBtn);
 
   // Toggle between 'normal' and 'computer' mode
   changeGamePlayModeBtn.addEventListener('click', () => {
@@ -154,22 +155,40 @@ const createGameModeSelection = () => {
   });
 };
 
-// Function to reset anchor-points to initial co-ordinates
+//* ** Anchor-Points ***//
+// For the lack of a better name, Anchor points refer to different possible origin co-ordinates
+// for checkWinXY() and checkWinZ() functions to perform their match checks
+// E.g in a 4 by 4 matrix where numOfSquaresToWin is set to 3,
+// there are 4 possible right-anchor points, denoted by *
+//
+//
+// [ 1 ] [ 1 ] [ 1 ] [   ]          [   ] [   ] [   ] [   ]
+// [ 1 ] [ 1 ] [ 1 ] [   ]          [ 2 ] [ 2 ] [ 2 ] [   ]
+// [ 1 ] [ 1 ] [ *1] [   ]          [ 2 ] [ 2 ] [ 2 ] [   ]
+// [   ] [   ] [   ] [   ]          [ 2 ] [ 2 ] [ *2] [   ]
+//
+// [   ] [ 3 ] [ 3 ] [ 3 ]          [   ] [   ] [   ] [   ]
+// [   ] [ 3 ] [ 3 ] [ 3 ]          [   ] [ 4 ] [ 4 ] [ 4 ]
+// [   ] [ 3 ] [ 3 ] [ *3]          [   ] [ 4 ] [ 4 ] [ 4 ]
+// [   ] [   ] [   ] [   ]          [   ] [ 4 ] [ 4 ] [ *4]
+// **** End of Illustration of Anchor-Points ***//
+
+// Function to reset anchor-points to initial co-ordinates (as per createAnchorPts fn)
 // Used with checkWin functions
 const resetAnchorPts = () => {
   initialRow = '';
   initialCol = '';
 };
 // Function that tracks every possible anchor-points
-// oX and oY are right-most anchor-points of each possible square depending on numOfSquaresToWin
-// z is the left most col value depending on numOfSquaresToWin
+// oX and oY are right-most anchor-points of each possible square depending on 'numOfSquaresToWin'
+// z is the left most col value depending on 'numOfSquaresToWin'
 // Used with checkWin functions
 /**
  * @param {Number} oX - row if checking horizontally; col if checking vertically
  * @param {Number} oY - col if checking horizontally; row if checking vertically
  * @param {String} direction - 4 directions: horizontal,vertical,
  *                           - diagonally (starting from) bot-right & bot-left
- * @param {Number} size - numOfSquaresToWin to win or boardSize if playing full board game
+ * @param {Number} size - 'numOfSquaresToWin' to win or boardSize if playing full board game
  */
 const trackAnchorPts = (oX, oY, direction, size) => {
   if (direction === 'horizontal') {
@@ -191,7 +210,7 @@ const trackAnchorPts = (oX, oY, direction, size) => {
 };
 
 // To generate all permutations of possible anchor-points for match-checking
-// in numOfSquaresToWin scenario to win (larger than 3x3 permutation grid)
+// in 'numOfSquaresToWin' scenario to win (larger than 3x3 permutation grid)
 const createAnchorPts = () => {
 // AnchorPts store the origins for variable numOfSquare game
   // columns and rows are zero-indexed
@@ -358,7 +377,7 @@ const checkFixSizeWin = () => {
   gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue2}`;
 };
 
-// Function that encapsulates checkWinXY and checkWinZ for numOfSquaresToWin scenario
+// Function that encapsulates checkWinXY and checkWinZ for 'numOfSquaresToWin' scenario
 const checkVarSizeWin = () => {
 // Create the initial set of anchor points
   const rightAnchorPts = createAnchorPts();
@@ -368,7 +387,8 @@ const checkVarSizeWin = () => {
   for (let i = 0; i < rightAnchorPts.length; i += 1) {
     const x = rightAnchorPts[i].row;
     const y = rightAnchorPts[i].column;
-    z = y - (numOfSquaresToWin - 1); // column - (size-1) [numOfSquaresToWin is already 0 indexed];
+    // column - (size-1) ['numOfSquaresToWin' is already 0 indexed];
+    z = y - (numOfSquaresToWin - 1);
 
     // //Check Horizontally
     resetAnchorPts();
@@ -438,7 +458,7 @@ const checkIfGameOver = () => {
 };
 
 // Function that returns a flat posMatrix array of
-// all possible empty positions in posMatrix indicated by string-numbers
+// all possible available positions in posMatrix indicated by string-numbers
 const getAvailPosArray = () => {
   let availPosArray = [];
   let removed = [];
@@ -457,11 +477,12 @@ const getAvailPosArray = () => {
   return availPosArray;
 };
 
-// Function that randomly selects a position within the flat posMatrix array
+// Function that randomly selects an index within the flat posMatrix array
+// to randomly select a string-number position in posMatrix
 const randPosGen = (length) => Math.floor(Math.random() * length);
 
-// Function that allows 'computer' to append its choice in a random empty position
-// within posMatrix, represented by a String-number
+// Function that allows 'computer' to randomly select an available position and append its choice
+// within posMatrix, where available position is represented by a String-number
 const computerRandSelect = () => {
   if (playerTurn === 'computer') {
     // why does this posMatrix also show the post-result of calling randPositionSelector?
@@ -516,19 +537,29 @@ const computerRandSelect = () => {
   }
 };
 
-// Function that completely rebuilds the entire board every time there's a click
+// Function that assigns 'X' or 'O' to the position matrix based on the square
+const squareClick = (row, column) => {
+  // Check if the clicked square has been clicked before
+  if (gameWon !== true && posMatrix[row][column] !== 'X' && posMatrix[row][column] !== 'O') {
+    // If not, assign current player's selection into matrix
+    posMatrix[row][column] = currentPlayer;
+    togglePlayer();
+  }
+};
+
+// Function that completely rebuilds the entire board
 const buildBoard = () => {
   // Initialise overall container that hold
   // 1)board display and 2) the match-result display elements
   gamePage = document.createElement('div');
 
-  // Initialise match results for fixed board size games
+  // Initialise match results Html display for fixed board size games
   gameResultDisplay1 = document.createElement('div');
   gameResultDisplay2 = document.createElement('div');
   gameResultDisplay3 = document.createElement('div');
   gameResultDisplay4 = document.createElement('div');
 
-  // Initialise match results for variable board size games
+  // Initialise match results Html display for variable num of square games
   gameResultDisplay5 = document.createElement('div');
   gameResultDisplay6 = document.createElement('div');
   gameResultDisplay7 = document.createElement('div');
@@ -550,10 +581,11 @@ const buildBoard = () => {
       rowElement.appendChild(square);
 
       // Set a click eventListener to each square element
-      // Disabling next-lines for lines below as it seems to be too long apparently
-      // eslint-disable-next-line
+      // Disabling next-lines for lines below as it contains
+      // unsafe references to variables(s)... no-loop-func
+      // eslint-disable-next-line no-loop-func
       square.addEventListener('click', () => {
-        // Check number of empty squares left i.e moves
+        // Check number of available squares left i.e moves
         movesLeft = getAvailPosArray().length - 1;
         console.log(movesLeft, 'movesLeft');
         if (playerTurn === 'player') {
@@ -593,16 +625,6 @@ const buildBoard = () => {
     console.log('test2');
     // add a single row to the board
     boardContainer.appendChild(rowElement);
-    gamePage.appendChild(boardContainer);
-    gamePage.appendChild(gameResultDisplay1);
-    gamePage.appendChild(gameResultDisplay2);
-    gamePage.appendChild(gameResultDisplay3);
-    gamePage.appendChild(gameResultDisplay4);
-    gamePage.appendChild(gameResultDisplay5);
-    gamePage.appendChild(gameResultDisplay6);
-    gamePage.appendChild(gameResultDisplay7);
-    gamePage.appendChild(gameResultDisplay8);
-    document.body.appendChild(gamePage);
   }
 };
 
@@ -648,60 +670,72 @@ const createUserInput = () => {
     resetGame();
     boardSize = boardSizeInput;
   });
+};
+
+// Function that creates the board container element and displays on the screen
+const gameInit = () => {
+  initPosMatrix();
+  buildBoard();
+  createUserInput();
+  createGamePlayModeSelection();
+
+  // Appending all children html here
+  gamePage.appendChild(boardContainer);
+
+  gamePage.appendChild(gameResultDisplay1);
+  gamePage.appendChild(gameResultDisplay2);
+  gamePage.appendChild(gameResultDisplay3);
+  gamePage.appendChild(gameResultDisplay4);
+
+  gamePage.appendChild(gameResultDisplay5);
+  gamePage.appendChild(gameResultDisplay6);
+  gamePage.appendChild(gameResultDisplay7);
+  gamePage.appendChild(gameResultDisplay8);
 
   gamePage.appendChild(numSquaresInput);
   gamePage.appendChild(submitNumSquaresBtn);
   gamePage.appendChild(numOfSquaresToWinInputDisplay);
 
+  // [WIP: buggy]
   gamePage.appendChild(boardSizeInput);
   gamePage.appendChild(submitBoardSizeBtn);
   gamePage.appendChild(boardSizeInputDisplay);
-};
 
-// Function that assigns 'X' or 'O' to the position matrix based on the square
-const squareClick = (row, column) => {
-  // Check if the clicked square has been clicked before
-  if (gameWon !== true && posMatrix[row][column] !== 'X' && posMatrix[row][column] !== 'O') {
-    // If not, assign current player's selection into matrix
-    posMatrix[row][column] = currentPlayer;
-    togglePlayer();
-  }
-};
+  gamePage.appendChild(changeGamePlayModeBtn);
 
-// Function that creates the board container element and displays on the screen
-const gameInit = () => {
-  // build the board - right now it's empty
-  // createPositionMatrix for tracking coordinates
-  initPosMatrix();
-  buildBoard();
-  createUserInput();
-  createGameModeSelection();
+  document.body.appendChild(gamePage);
   document.body.appendChild(outputMessages);
 };
 
 // ===================================EXECUTE GAME=================================//
 gameInit();
 
-// ===================EXTRA-INFO ON MATCHING LOGIC(s)==============================//
-// CHECKING HORIZONTALLY & VERTICALLY
+// ===================EXTRA-INFO ON MATCHING LOGIC(s)[WIP]=========================//
+//
+// ******************* CHECKING HORIZONTALLY & VERTICALLY**************************//
 // Pattern To Understand for match checking in different sizes
-// numOfSquaresToWin(size) level  diff
-//        3            1     2
-//        4            2     2
-//        5            3     2
-//        6            4     2
-// This is same for both rows and columns
-// hence initialRow or initialColumn - (size - 2) ==> Works for checking horizontally and vertically
+// numOfSquaresToWin(size) Level*  Difference
+//        3                 1       2
+//        4                 2       2
+//        5                 3       2
+//        6                 4       2
+// [WIP] Level* refers to number of rows and cols away from right anchor/origin coordinate
+// to evaluate if base case has been reached.
+// This is same for both rows and columns.
+// Hence for initialRow or initialColumn, deduction of the difference 2 from size
+// is needed for checking horizontally and vertically
 
+// ******************************* CHECKING DIAGONALLY******************************//
 // CHECKING DIAGONALLY
 // For checking diagonally for variable number of squares:
 
-// For checking bottom left to bottom right
+// For checking from bottom right to top left (i.e bot-left):
 // checkWinZ() is written such that it will always evaluate at the
 // 2nd right highest point i.e 1 position left of its original anchor point. Hence initialCol - 1;
 
-// For checking bottom right to bottom left
-// Fn is written such that it will always evaluate
-// at the 2nd right highest point i.e initialRow - (size - 2);
-// P.S initialRow is zero-indexed and size is not
+// For checking bottom left to top right (i.e bot-right):
+// checkWinZ() is written such that it will always evaluate at the
+//  2nd left highest point i.e initialRow - (size - 2);
+
+// P.S initialRow is zero-indexed and size is not zero-indexed
 // P.S size is an argument that can take on numOfSquaresToWin or boardSize (i.e full board)
