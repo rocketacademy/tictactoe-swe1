@@ -13,7 +13,7 @@ let winner = '';
 // Tracks current player, either X or O
 let currentPlayer = 'X';
 
-// ------------------- Co-ordinates Tracking &  Management----------------//
+// ------------------- Co-ordinates Tracking & Management----------------//
 
 // Declares a matrix that tracks the positions of available,'X' and 'O' squares
 // on the board for matching purposes. Available positions are represented by
@@ -215,16 +215,14 @@ const trackAnchorPts = (oX, oY, direction, size) => {
 // To generate all permutations of possible anchor-points for match-checking
 // in 'numOfSquaresToWin' scenario to win (larger than 3x3 permutation grid)
 const createAnchorPts = () => {
-// AnchorPts store the origins for variable numOfSquare game
+  // AnchorPts store the origins for variable numOfSquare game
   // columns and rows are zero-indexed
   const rightAnchorPts = [];
   // To add another anchorPt in the array, increment by 1
   let i = 0;
 
-  // oX refers to rows
-  // oY refers to column
-  // using oX instead of generic variable document the draw linkage to the oX global variable
-
+  // oX refers to rows of an anchor-point
+  // oY refers to column of an anchor-point
   for (let oX = boardSize; oX - numOfSquaresToWin >= 0; oX -= 1) {
     for (let oY = boardSize; oY - numOfSquaresToWin >= 0; oY -= 1) {
       rightAnchorPts.push({});
@@ -236,10 +234,18 @@ const createAnchorPts = () => {
   }
   return rightAnchorPts;
 };
-// Function that checks for matches vertically or horizontally (in either 'x' or 'y' directions)
-// Input 'horizontal' or  'vertical' to check for matches
-// x and y are global variables which hold the global co-ordinates
-// note that X refers to the ROW and Y refers to the COLUMN in horizontal mode
+
+// Function that checks for matches vertically or horizontally (in either 'x' or 'y' axis)
+/**
+ *
+ * @param {Number} x - refers the global variable that is row of the right-most origin co-ordinate
+ * @param {Number} y - refers the global variable that is col of the right-most origin co-ordinate
+ * @param {String} direction - either check 'horizontal' or 'vertical'
+ * @param {Number} size - input 'boardSize' for fixed full board game
+ *                        or numOfSquaresToWin for var board game
+ * Note: right and left-most boundaries are a function of numOfSquaresToWin if defined
+ * Refer to end of script for more info
+ */
 const checkWinXY = (x, y, direction, size) => {
   // Swap x and y to toggle between checking horizontally
   // and vertically by using intermediate variables
@@ -321,8 +327,21 @@ const checkWinXY = (x, y, direction, size) => {
 };
 
 // Function that checks for matches diagonally (in 'z' direction)
+
+/**
+ *
+ * @param {Number} x - refers the global variable that is row of the right-most origin co-ordinate
+ * @param {Number} y - refers the global variable that is col of the right-most origin co-ordinate
+ * @param {Number} z - refers to global variable that is col of the left-most anchor co-ordinate
+ * @param {String} direction - either check 'horizontal' or 'vertical'
+ * @param {Number} size - input 'boardSize' for fixed full board game
+ *                        or numOfSquaresToWin for var board game
+ *
+ * Note: right and left-most boundaries are a function of numOfSquaresToWin if defined
+ * Refer to end of script for more info
+ */
 const checkWinZ = (x, y, z, direction, size) => {
-  // using x and y at initialization implies starting to check from the bottom right hand corner
+  // using x and y at initialization implies starting to check from the bottom-right hand corner
   if (direction === 'bot-right') {
     if (posMatrix[x][y] === posMatrix[x - 1][y - 1]) {
       // Refer to extra game logic at end of script
@@ -369,24 +388,25 @@ const checkWinZ = (x, y, z, direction, size) => {
 
 // Function that encapsulates checkWinXY and checkWinZ for fixed boardSize scenario
 const checkFixSizeWin = () => {
-// Check Horizontally
-  resetAnchorPts();
+  // Check Horizontally
+
+  // Track or (swap) the initialRow and initialCol depending on the direction checked
+  // for each anchor-point
   trackAnchorPts(x, y, 'horizontal', 'boardSize');
   checkWinXY(x, y, 'horizontal', boardSize);
   gameResultDisplay1.innerText = `Checked horizontally: ${outputValue1}`;
 
   // Check Vertically
-  resetAnchorPts();
   trackAnchorPts(x, y, 'vertical', 'boardSize');
   checkWinXY(x, y, 'vertical', boardSize);
   gameResultDisplay2.innerText = `Checked vertically: ${outputValue1}`;
 
-  // Check Diagonally Left
+  // Check Diagonally from Bot-Left to Top-Right
   trackAnchorPts(x, y, 'bot-left', boardSize);
   checkWinZ(x, y, z, 'bot-left', boardSize);
   gameResultDisplay3.innerText = `Check top-right to bottom-left diagonally: ${outputValue3}`;
 
-  // Check Diagonally Right
+  // Check Diagonally from Bot-Right to Top-Left
   trackAnchorPts(x, y, 'bot-right', boardSize);
   checkWinZ(x, y, z, 'bot-right', boardSize);
   gameResultDisplay4.innerText = `Check top-left to bottom-right diagonally: ${outputValue2}`;
@@ -492,12 +512,12 @@ const getAvailPosArray = () => {
   return availPosArray;
 };
 
-// Function that randomly selects an index within the flat posMatrix array
+// Function that randomly selects an index within the availPosArray
 // to randomly select a string-number position in posMatrix
 const randPosGen = (length) => Math.floor(Math.random() * length);
 
 // Function that allows 'computer' to randomly select an available position and append its choice
-// within posMatrix, where available position is represented by a String-number
+// within posMatrix, where an available position is represented by a String-number
 const computerRandSelect = () => {
   if (playerTurn === 'computer') {
     // why does this posMatrix also show the post-result of calling randPositionSelector?
@@ -552,7 +572,7 @@ const computerRandSelect = () => {
   }
 };
 
-// Function that assigns 'X' or 'O' to the position matrix based on the square
+// Function that assigns 'X' or 'O' to the position matrix based on the square clicked
 const squareClick = (row, column) => {
   // Check if the clicked square has been clicked before
   if (gameWon !== true && posMatrix[row][column] !== 'X' && posMatrix[row][column] !== 'O') {
