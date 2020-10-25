@@ -147,12 +147,9 @@ const createGamePlayModeSelection = () => {
   changeGamePlayModeBtn.addEventListener('click', () => {
     if (gamePlayMode === 'normal') {
       gamePlayMode = 'computer';
-      console.log(gamePlayMode, 'gamePlayMode');
     } else if (gamePlayMode === 'computer') {
       gamePlayMode = 'normal';
-      console.log(gamePlayMode, 'gamePlayMode');
     }
-    console.log('button pressed');
     changeGamePlayModeBtn.innerText = gamePlayMode;
   });
 };
@@ -204,7 +201,6 @@ const trackAnchorPts = (oX, oY, direction, size) => {
     initialRow = oX;
     initialCol = oY;
     z = oY - (size - 1);
-    console.log('z is reset');
   }
 };
 
@@ -279,7 +275,6 @@ const checkWinXY = (x, y, direction, size) => {
       // BASE CASE: Once we reached the top left 2 boxes where y === 1 and y-1 === 0
       // Implicitly there is no match and hence no winner
       if (d === initialCol - (size - 2)) {
-        console.log('no winner');
         outputValue1 = 'There is no winner';
         return outputValue1;
       }
@@ -373,7 +368,6 @@ const checkWinZ = (x, y, z, direction, size) => {
     } else {
       // Stop gap measure to have 2 different outputvalues
       // due to bug when displaying to Fixed and Variable square games
-      console.log('no winner');
       outputValue2 = 'There is no match';
       outputValue3 = 'There is no match';
     }
@@ -409,7 +403,6 @@ const checkFixSizeWin = () => {
 const checkVarSizeWin = () => {
 // Create the initial set of anchor-points
   const rightAnchorPts = createAnchorPts();
-  console.log(rightAnchorPts);
 
   // Go through each of the possible right anchor-points and check for matches in XY direction
   for (let i = 0; i < rightAnchorPts.length; i += 1) {
@@ -477,13 +470,11 @@ const resetGame = (newBoardSize) => {
 // Function that resets game and displays relevant messages after game is over
 const checkIfGameOver = () => {
   if (gameWon === true) {
-    console.log(winner, 'winner');
     outputMessages.innerText = `Game over! Player ${winner} wins!`;
     setTimeout(() => {
       resetGame();
     }, 2000);
   } else if (gameWon === false && movesLeft === 0) {
-    console.log(winner, 'no winner!!!');
     outputMessages.innerText = 'Game over! There is no winner';
     setTimeout(() => {
       resetGame();
@@ -507,7 +498,6 @@ const getAvailPosArray = () => {
       i += 1;
     }
   }
-  console.log(availPosArray);
   return availPosArray;
 };
 
@@ -519,9 +509,6 @@ const randPosGen = (length) => Math.floor(Math.random() * length);
 // within posMatrix, where an available position is represented by a String-number
 const computerRandSelect = () => {
   if (playerTurn === 'computer') {
-    // why does this posMatrix also show the post-result of calling randPositionSelector?
-    console.log(posMatrix, 'before');
-
     // Get a flat array of string-number labeled positions that corresponds to the posMatrix
     const availPosArray = getAvailPosArray();
 
@@ -530,7 +517,6 @@ const computerRandSelect = () => {
 
     // The string-number is then reproduced as chosenPosition
     const chosenNumPosition = availPosArray[indexOfRandPosition];
-    console.log(chosenNumPosition, 'chosenPosition');
 
     // Loop through posMatrix and obtain computer's randomly selected position
     let i = 0;
@@ -552,10 +538,6 @@ const computerRandSelect = () => {
         break;
       }
     }
-    console.log(row, 'row');
-    console.log(col, 'col');
-    console.log(posMatrix, 'after');
-
     // String-number position corresponds to square's string-number css id
     const squarePosID = posMatrix[row][col];
     const computerChosenSquare = document.getElementById(squarePosID);
@@ -626,13 +608,11 @@ const buildBoard = () => {
           movesLeft = getAvailPosArray().length;
           if (square.innerText === '') {
             if (gameWon === false) {
-              console.log(posMatrix[i][j]);
               square.innerText = posMatrix[i][j];
               outputMessages.innerText = `It is Player ${currentPlayer}'s turn`;
               // Function implicitly checks if gamePlayMode is true,
               // if yes, then switch to 'computer'
               togglePlayerTurn();
-              console.log(playerTurn, 'playerTurn');
               // Function implicitly checks if playerTurn is 'computer', computer chooses
               computerRandSelect();
               // Update latest moves left after com makes its move
