@@ -7,10 +7,11 @@ const completeBoard = [
 
 // the element that contains the rows and squares
 let boardElement = null;
-
 // the element that contains the entire board
 // we can empty it out for convenience
 let boardContainer = null;
+// Element to display the game status message
+let divDisplayStatus = null;
 
 // current player global starts at X
 let currentPlayer = 'X';
@@ -24,19 +25,116 @@ const togglePlayer = () => {
   }
 };
 
-const squareClick = (column, row) => {
-  console.log('coordinates', column, row);
+// Function to set the display message
+const setDisplayStatus = (message) => {
+  divDisplayStatus.innerHTML = message;
+};
+
+// Function to check whether the current player has won the game
+const checkWin = (board) => {
+  let bGameWin = true;
+  // Compare with the "across" values i.e. same row, diff cols
+  // Comparing by each row
+  console.log('Row comparison: ');
+  for (let idxRow = 0; idxRow < board.length; idxRow += 1)
+  {
+    bGameWin = true;
+    for (let idxCol = 0; idxCol < board[idxRow].length; idxCol += 1)
+    {
+      console.log(`board[${idxRow}][${idxCol}] = ${board[idxRow][idxCol]}`);
+      // If any value is not same as the expected value, break the inner loop
+      if (board[idxRow][idxCol] !== currentPlayer)
+      {
+        bGameWin = false;
+        break;
+      }
+    }
+    // all the value in a row are matching. Return true.
+    if (bGameWin)
+    {
+      return true;
+    }
+  }
+
+  // Compare vertically i.e. same column, diff rows
+  console.log('Column comparison:');
+  const numOfCols = board[0].length;
+  for (let idxCol = 0; idxCol < numOfCols; idxCol += 1)
+  {
+    bGameWin = true;
+    for (let idxRow = 0; idxRow < board.length; idxRow += 1)
+    {
+      console.log(`board[${idxRow}][${idxCol}] = ${board[idxRow][idxCol]}`);
+      // If any value is not same as the expected value, break the inner loop
+      if (board[idxRow][idxCol] !== currentPlayer)
+      {
+        bGameWin = false;
+        break;
+      }
+    }
+    // all the value in a column are matching. Return true.
+    if (bGameWin)
+    {
+      return true;
+    }
+  }
+
+  // Compare diagonally - from top left to bottom right
+  // check only for those sqaures where row === column
+  console.log('Diagonal TL to BR: ');
+  for (let idxRow = 0; idxRow < board.length; idxRow += 1)
+  {
+    console.log(`board[${idxRow}][${idxRow}] = ${board[idxRow][idxRow]}`);
+    bGameWin = true;
+    if (board[idxRow][idxRow] !== currentPlayer)
+    {
+      bGameWin = false;
+      break;
+    }
+  }
+  if (bGameWin)
+  {
+    return true;
+  }
+  // Compare diagonally from top-right to bottom-left
+  // Here the row index is increased while the column index is decreased
+  // Row index starts from the first, while column starts from the last which is length-1
+  console.log('Diagonal: TR to BL: ');
+  for (let idxRow = 0; idxRow < board.length; idxRow += 1)
+  {
+    bGameWin = true;
+    const idxCol = board[idxRow].length - 1 - idxRow;
+    console.log(`board[${idxRow}][${idxCol}] = ${board[idxRow][idxCol]}`);
+    if (board[idxRow][idxCol] !== currentPlayer)
+    {
+      bGameWin = false;
+      break;
+    }
+  }
+  return bGameWin;
+};
+
+const squareClick = (row, column) => {
+  console.log('coordinates', row, column);
 
   // see if the clicked square has been clicked on before
-  if (completeBoard[column][row] === '') {
+  if (completeBoard[row][column] === '') {
     // alter the data array, set it to the current player
-    completeBoard[column][row] = currentPlayer;
-
-    // refresh the creen with a new board
+    completeBoard[row][column] = currentPlayer;
+    // refresh the screen with a new board
     // according to the array that was just changed
     // eslint-disable-next-line no-use-before-define
     buildBoard(completeBoard);
-
+    if (checkWin(completeBoard))
+    {
+      setDisplayStatus(`Game over. ${currentPlayer} wins!!. Resetting the Game...`);
+      setTimeout(() => {
+        // eslint disables as resetGame used the function buildBoard
+        // eslint-disable-next-line no-use-before-define
+        resetGame();
+      }, 5000);
+      return;
+    }
     // change the player
     togglePlayer();
   }
@@ -79,10 +177,29 @@ const buildBoard = (board) => {
   }
 };
 
+// Function that resets the game to the intial stage
+const resetGame = () => {
+  console.log('reset');
+  currentPlayer = 'X';
+  setDisplayStatus('');
+  boardContainer.innerHTML = '';
+  for (let idxRow = 0; idxRow < completeBoard.length; idxRow += 1)
+  {
+    for (let idxCol = 0; idxCol < completeBoard[idxRow].length; idxCol += 1)
+    {
+      completeBoard[idxRow][idxCol] = '';
+    }
+  }
+  buildBoard(completeBoard);
+};
+
 // Game intialization
 const gameInit = () => {
   boardContainer = document.createElement('div');
   document.body.appendChild(boardContainer);
+
+  divDisplayStatus = document.createElement('div');
+  document.body.appendChild(divDisplayStatus);
 
   // Build the entire board - right now it's empty
   buildBoard(completeBoard);
