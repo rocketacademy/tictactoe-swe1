@@ -243,6 +243,9 @@ const buildBoard = () => {
 
     // add a single row to the board
     boardContainer.appendChild(rowElement);
+
+    // display the board
+    document.body.appendChild(boardContainer);
   }
 };
 
@@ -275,7 +278,6 @@ const gameInit = () => {
   boardSizeContainer.appendChild(boardSizeButton);
 
   // append to starting elements to browser body tag
-  document.body.appendChild(boardContainer);
   document.body.appendChild(boardSizeContainer);
 };
 
