@@ -1,5 +1,8 @@
 body {
   background-color: pink;
+  font-family: sans-serif;
+  text-align: center;
+  display: block;
 }
 
 .square {
@@ -10,4 +13,19 @@ body {
   height: 10px;
   width: 10px;
   vertical-align: top;
+}
+
+.button-style {
+  margin: 10px;
+}
+
+.input-field {
+  margin: 10px;
+}
+
+.message {
+  background-color: grey;
+  font-size: 30px;
+  border-radius: 10px;
+  padding: 10px;
 }

@@ -6,20 +6,21 @@
 // 5. Nice to haves are Message boards, highlighted winning conditions, win messages
 
 // Game parameters
-const boardSize = 3;
+let boardSize = 3;
 
 // Declare global variables
 const board = [];
 let boardContainer;
 let msgContainer;
+let btnSubmit;
+let inputBoardSize;
 let currentPlayer = 'X';
 let gameMode = 'play';
 
 // Function 1: Completely Rebuilds the entire board every time there's a click
-const buildBoard = (board) => {
+const buildBoard = () => {
   // start with an empty container
   boardContainer.innerHTML = '';
-
   // move through the board data array and create the
   // current state of the board
   for (let i = 0; i < board.length; i += 1) {
@@ -52,22 +53,59 @@ const buildBoard = (board) => {
   }
 };
 
-// Function 2: create the board container element and put it on the screen
-const initGame = () => {
-  boardContainer = document.createElement('div');
-  msgContainer = document.createElement('div');
-  document.body.appendChild(msgContainer);
-  document.body.appendChild(boardContainer);
+// Function 6: Update message board
+const updateMsgBoard = () => {
+  if (gameMode === 'play') {
+    msgContainer.innerHTML = `${currentPlayer}'s turn!`;
+  }
+  if (gameMode === 'gameEnd') {
+    msgContainer.innerHTML = `GAME END! </br> ${currentPlayer} won!! </br> submit a new grid to play again`;
+  }
+};
 
+// Function 7: Update board array
+const updateBoardArr = () => {
   // create board array
+  while (board.length > 0) {
+    board.pop();
+  }
   for (let i = 0; i < boardSize; i += 1) {
     board.push([]);
     for (let j = 0; j < boardSize; j += 1) {
       board[i].push('');
     }
   }
+};
+
+// Function 2: create the board container element and put it on the screen
+const initGame = () => {
+  boardContainer = document.createElement('div');
+  inputBoardSize = document.createElement('input');
+  btnSubmit = document.createElement('button');
+  msgContainer = document.createElement('div');
+  inputBoardSize.classList.add('input-field');
+  btnSubmit.classList.add('button-style');
+  msgContainer.classList.add('message');
+  document.body.appendChild(inputBoardSize);
+  document.body.appendChild(btnSubmit);
+  document.body.appendChild(msgContainer);
+  document.body.appendChild(boardContainer);
+  btnSubmit.addEventListener('click', () => {
+    boardSize = inputBoardSize.value;
+    inputBoardSize.value = '';
+    updateBoardArr();
+    buildBoard(board);
+    gameMode = 'play';
+  });
+
   // build the board - right now it's empty
+  updateBoardArr();
   buildBoard(board);
+
+  updateMsgBoard();
+  inputBoardSize.value = 'input a number > 1';
+  btnSubmit.innerHTML = 'Submit';
+  msgContainer.innerHTML = 'Input grid size';
 };
 
 // Function 3: switch the global values from one player to the next
@@ -148,6 +186,8 @@ const checkWin = (playerSymbol) => {
   if (rowMatch || colMatch || acrossMatch) {
     console.log(`${playerSymbol} WON!! `);
     gameMode = 'gameEnd';
+    togglePlayer();
+    updateMsgBoard();
   }
   console.log('(2) RESULTS:');
   console.log(`Game End? : ${rowMatch}, ${colMatch}, ${acrossMatch}`);
@@ -169,6 +209,7 @@ const squareClick = (column, row) => {
 
     // change the player
     togglePlayer();
+    updateMsgBoard();
   }
 };
 
