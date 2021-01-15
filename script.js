@@ -1,15 +1,3 @@
-// Declare global variables
-const boardSize = 3;
-const board = [];
-// let boardElement; // the element that contains the rows and squares
-
-// the element that contains the entire board
-// we can empty it out for convenience
-let boardContainer;
-let msgContainer;
-let currentPlayer = 'X';
-let gameMode = 'play';
-
 // The Big Idea
 // 1. The variable 'board' is a 2-dimension array which holds a 'X', 'O', or ''.
 // 2. With each click, 'board' is updated (through 'squareClick')
@@ -17,12 +5,20 @@ let gameMode = 'play';
 // 4. Your primary task is to create the winning condition
 // 5. Nice to haves are Message boards, highlighted winning conditions, win messages
 
+// Game parameters
+const boardSize = 3;
+
+// Declare global variables
+const board = [];
+let boardContainer;
+let msgContainer;
+let currentPlayer = 'X';
+let gameMode = 'play';
+
 // Function 1: Completely Rebuilds the entire board every time there's a click
 const buildBoard = (board) => {
   // start with an empty container
   boardContainer.innerHTML = '';
-  // boardElement = document.createElement('div');
-  // boardElement.classList.add('board');
 
   // move through the board data array and create the
   // current state of the board
