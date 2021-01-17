@@ -154,10 +154,8 @@ const checkWin = (playerSymbol) => {
     if (board[i][i] !== playerSymbol) {
       acrossCheckArray[0] = false;
     }
-    for (let j = boardSize - 1; j >= 0; j -= 1) {
-      if (board[i][j] !== playerSymbol) {
-        acrossCheckArray[1] = false;
-      }
+    if (board[i][boardSize - 1 - i] !== playerSymbol) {
+      acrossCheckArray[1] = false;
     }
   }
   console.log(`==== ${playerSymbol}'s turn ====`);
