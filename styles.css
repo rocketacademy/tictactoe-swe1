@@ -1,3 +1,28 @@
 body {
-  background-color: pink;
+  font-family: Impact;
+  font-size: 1.5em;
+  background-color: gold;
+  text-align: center;
+}
+
+.board {
+  border: black solid;
+}
+
+.square {
+  vertical-align: top;
+  padding: 10px;
+  margin: 10px;
+  background-color: white;
+  display: inline-block;
+  height: 50px;
+  width: 50px;
+  font-size: 40px;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+}
+
+.winner {
+  margin-top: 30px;
+  font-size: 3em;
+  letter-spacing: 0.1em;
 }
