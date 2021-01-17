@@ -1,3 +1,21 @@
 body {
   background-color: pink;
 }
+.board {
+  position: relative;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.square{
+  padding:10px;
+  margin:10px;
+  background-color:white;
+  display:inline-block;
+  height:20px;
+  width:20px;
+  vertical-align: top;
+  font-size: 7px;
+  text-align: center;
+  line-height: 20px;
+}
+
