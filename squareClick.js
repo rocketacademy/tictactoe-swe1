@@ -1,7 +1,12 @@
 // // CHECK FOR WIN
 const checkWin = (board) => {
-  console.log("THIS IS BOARD FROM checkWin", board);
   // check every position
+  const topRow = board[0].join("");
+  console.log("BOARD CHECK", typeof topRow);
+  console.log(topRow);
+  const l = "xxx";
+  // console.log(l);
+
   // there is a conditional for all 15 win conditions
   // if (board[0][0] === board[0][1] && board[0][1] === board[0][2]) {
   if (
@@ -9,7 +14,35 @@ const checkWin = (board) => {
     board[0][1] === currentPlayer &&
     board[0][2] === currentPlayer
   ) {
-    console.log("HORIZONTAL MATCH", board[0][0], board[0][1], board[0][2]);
+    console.log("HORIZONTAL TOP MATCH");
+    // XXX
+    return true;
+  }
+  if (
+    board[1][0] === currentPlayer &&
+    board[1][1] === currentPlayer &&
+    board[1][2] === currentPlayer
+  ) {
+    console.log(
+      "HORIZONTAL MIDDLE MATCH",
+      board[1][0],
+      board[1][1],
+      board[1][2]
+    );
+    // XXX
+    return true;
+  }
+  if (
+    board[2][0] === currentPlayer &&
+    board[2][1] === currentPlayer &&
+    board[2][2] === currentPlayer
+  ) {
+    console.log(
+      "HORIZONTAL BOTTOM MATCH",
+      board[0][0],
+      board[0][1],
+      board[0][2]
+    );
     // XXX
     return true;
   }
@@ -20,10 +53,30 @@ const checkWin = (board) => {
     board[1][0] === currentPlayer &&
     board[2][0] === currentPlayer
   ) {
-    // const theMatch = [board[0][0], board[1][0], board[2][0]];
-    // const theBoard = board;
-    console.log("VERTICAL MATCH", board);
-    // console.log("THE BAORD,", board);
+    console.log("VERTICAL LEFT MATCH", board);
+    // X
+    // X
+    // X
+    return true;
+  }
+  if (
+    board[0][1] === currentPlayer &&
+    board[1][1] === currentPlayer &&
+    board[2][1] === currentPlayer
+  ) {
+    console.log("VERTICAL MIDDLE MATCH", board);
+    // X
+    // X
+    // X
+    return true;
+  }
+
+  if (
+    board[0][2] === currentPlayer &&
+    board[1][2] === currentPlayer &&
+    board[2][2] === currentPlayer
+  ) {
+    console.log("VERTICAL RIGHT MATCH", board);
     // X
     // X
     // X
@@ -45,9 +98,9 @@ const squareClick = (column, row) => {
       console.log("CHECK WIN TRUE");
       console.log(checkWin(board));
       // game over
-      location.reload();
+      // location.reload();
+      console.log("YUP WON");
     } else {
-      // togglePlayer();
     }
     // refresh the creen with a new board
     // according to the array that was just changed
