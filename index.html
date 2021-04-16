@@ -2,12 +2,32 @@
 <html>
   <head>
     <title>Tic Tac Toe</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orelega+One&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
 
   <body>
-    <h1 id="header">Tic Tac Toe!</h1>
+    <h1 id="header">Tic Tac Toe Game</h1>
+    <input
+      class="inputs"
+      id="size-input"
+      type="text"
+      placeholder="Enter Board Size"
+    />
+    <input
+      class="inputs"
+      id="winning-input"
+      type="text"
+      placeholder="Enter Number of Squares to Win"
+    />
+    <button id="submit-button">submit</button>
+    <h2 id="game-result"></h2>
     <!-- Import program logic -->
-    <script src="script.js"></script>
+    <script src="helperFunction.js"></script>
+    <script src="gameInit.js"></script>
   </body>
 </html>
