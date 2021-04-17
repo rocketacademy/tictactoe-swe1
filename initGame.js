@@ -6,5 +6,6 @@ const initGame = (board) => {
   root.appendChild(boardContainer);
 
   // build the board - right now it's empty
+
   buildBoard(board);
 };
