@@ -1,7 +1,7 @@
 // GAME INIT FUNCTION
 // create the board container element and put it on the screen
 const initGame = (board) => {
-  const root = document.getElementById("root");
+  // const root = document.getElementById("root");
   boardContainer = document.createElement("div");
   root.appendChild(boardContainer);
 

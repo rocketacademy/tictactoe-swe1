@@ -84,3 +84,14 @@ body {
   padding: 5% 3%;
   transition: 0.3s;
 }
+
+/******* WINNER MESSAGE *******/
+.winner-message-container {
+  display: flex;
+  display: block;
+  text-align: center;
+  margin-top: 5%;
+}
+.winner-message {
+  color: #5ed54b;
+}

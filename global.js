@@ -14,3 +14,5 @@ let boardContainer;
 
 // current player global starts at X
 let currentPlayer = "X";
+
+const root = document.getElementById("root");
