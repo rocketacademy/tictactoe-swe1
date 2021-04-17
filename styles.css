@@ -94,4 +94,5 @@ body {
 }
 .winner-message {
   color: #5ed54b;
+  text-shadow: 2px 5px 3px #fff;
 }
