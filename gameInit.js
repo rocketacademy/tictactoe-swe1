@@ -6,6 +6,7 @@ saveInput.addEventListener("click", () => {
   boardSize = numberInput;
   winSquares = winningInput;
   console.log(boardSize);
+  const prevBoard = document.querySelector("board-box");
   initGame();
 });
 // create the board container element and put it on the screen

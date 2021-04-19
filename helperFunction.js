@@ -24,77 +24,48 @@ let boardContainer;
 let currentPlayer = "X";
 
 const checkWin = (board, row, column) => {
-  const returnCoords = (coord) => {
-    if (coord < 0) {
-      const newCoord = +coord + +boardSize;
-      return newCoord;
-    }
-    if (coord === 0) {
-      return 0;
-    }
-    if (coord > boardSize) {
-      return +coord - +boardSize;
-    } else {
-      return coord;
-    }
-  };
   let checksDoneRow = 0;
   let checksDoneCol = 0;
   let checksDoneDiag1 = 0;
   let checksDoneDiag2 = 0;
-  for (i = 1; i < boardSize; i++) {
-    if (board[row][returnCoords(column - i)] === currentPlayer) {
-      console.log(board[row][returnCoords(column - i)]);
+  for (i = 0; i < boardSize; i++) {
+    if (board[row][i] === currentPlayer) {
       checksDoneCol += 1;
+      console.log(checksDoneCol);
     } else {
       checksDoneCol = 0;
+      console.log(checksDoneCol);
     }
-    if (board[returnCoords(row - i)][column] === currentPlayer) {
+    if (board[i][column] === currentPlayer) {
       checksDoneRow += 1;
+      console.log(checksDoneRow);
     } else {
       checksDoneRow = 0;
+      console.log(checksDoneRow);
     }
-    if (
-      board[returnCoords(row - i)][returnCoords(column - i)] === currentPlayer
-    ) {
+    if (board[i][i] === currentPlayer) {
       checksDoneDiag1 += 1;
+      console.log(checksDoneDiag1);
     } else {
       checksDoneDiag1 = 0;
+      console.log(checksDoneDiag1);
     }
-    if (
-      board[returnCoords(row - i)][returnCoords(column + i)] === currentPlayer
-    ) {
+    if (board[boardSize - 1 - i][i] === currentPlayer) {
       checksDoneDiag2 += 1;
+      console.log(checksDoneDiag2);
     } else {
       checksDoneDiag2 = 0;
+      console.log(checksDoneDiag2);
     }
     if (
-      checksDoneRow === parseInt(winSquares) - 1 ||
-      checksDoneCol === parseInt(winSquares) - 1 ||
-      checksDoneDiag1 === parseInt(winSquares) - 1 ||
-      checksDoneDiag2 === parseInt(winSquares) - 1
+      checksDoneRow === parseInt(winSquares) ||
+      checksDoneCol === parseInt(winSquares) ||
+      checksDoneDiag1 === parseInt(winSquares) ||
+      checksDoneDiag2 === parseInt(winSquares)
     ) {
       return true;
     }
   }
-  // const rowCoordinate = board[returnCoords(row - 1)][column];
-  // const columnCoordinate = board[row][returnCoords(column - 1)];
-  // const diagonalCoordinate1 =
-  //   board[returnCoords(row - 1)][returnCoords(column - 1)];
-  // const diagonalCoordinate2 =
-  //   board[returnCoords(row - 1)][returnCoords(column + 1)];
-  // if (
-  //   (board[row][returnCoords(column - 2)] === currentPlayer &&
-  //     columnCoordinate === currentPlayer) ||
-  //   (board[returnCoords(row - 2)][column] === currentPlayer &&
-  //     rowCoordinate === currentPlayer) ||
-  //   (board[returnCoords(row - 2)][returnCoords(column - 2)] === currentPlayer &&
-  //     diagonalCoordinate1 === currentPlayer) ||
-  //   (board[returnCoords(row - 2)][returnCoords(column + 2)] === currentPlayer &&
-  //     diagonalCoordinate2 === currentPlayer)
-  // ) {
-  //   return true;
-  // }
 };
 // completely rebuilds the entire board every time there's a click
 const squareClick = (row, column) => {
