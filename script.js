@@ -1,3 +1,24 @@
+// Please implement exercise logic here
+// keep data about the game in a 2-D array
+const board = [
+  ['', '', ''],
+  ['', '', ''],
+  ['', '', ''],
+];
+
+// the element that contains the rows and squares
+let boardElement;
+
+// the element that contains the entire board
+// we can empty it out for convenience
+let boardContainer;
+
+// current player global starts at X
+let currentPlayer;
+currentPlayer = 'X';
+
+const won = false;
+
 // completely rebuilds the entire board every time there's a click
 const buildBoard = (board) => {
   // start with an empty container
@@ -55,21 +76,56 @@ const togglePlayer = () => {
   }
 };
 
-const squareClick = (column, row) => {
-  console.log('coordinates', column, row);
+function displayWinner(winner) {
+  const winnerPara = document.createElement('p');
+  document.body.appendChild(winnerPara);
+  winnerPara.innerText = `${winner} won the game!`;
+}
 
-  // see if the clicked square has been clicked on before
-  if (board[column][row] === '') {
-    // alter the data array, set it to the current player
-    board[column][row] = currentPlayer;
+// const checkWin = (board) => {
+//   // check every position
+//   // there is a conditional for all 15 win conditions
 
-    // refresh the creen with a new board
-    // according to the array that was just changed
-    buildBoard(board);
+//   for (let i = 0; i < board.length; i++) {
+//     for (let j = 0; j < board.length; j++) {
+//       const cordinates = board[i][j];
+//       cordinatesArr.push(cordinates);
+//     }
+//     if (cordinatesArr[0] === cordinatesArr[1] === cordinatesArr[2]) {
+//       return (console.log('match found'));
+//     }
+//   }
+// };
 
-    // change the player
-    togglePlayer();
+const checkWin = (board) => {
+  // check every position
+  // there is a conditional for all 15 win conditions
+  if (board[0][0] === board[0][1] && board[0][1] === board[0][2]) {
+    displayWinner(currentPlayer);
+    return true;
+  }
+
+  if (board[0][0] === board[1][0] && board[1][0] === board[2][0]) {
+    // X
+    // X
+    // X
   }
 };
+
+function squareClick(column, row) {
+  if (board[column][row] === '') {
+    board[column][row] = currentPlayer;
+    if (checkWin(board) === true) {
+      // game over
+      console.log('game over');
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } else {
+      togglePlayer();
+    }
+  }
+  buildBoard(board);
+}
 
 initGame();
