@@ -22,7 +22,20 @@ const checkWin = (currentPlayer) => {
     });
   });
 };
+
+// CHECK DRAW !!! NOT COMPLETED \\ COME BACK TO THIS WHEN I HAVE TIME
+const checkDraw = (currentPlayer) => {
+  return board.some((b) => {
+    console.log(b);
+    return b.every((element) => {
+      console.log("CHECKDRAW ELEMENT ---> ", element);
+      return element != "";
+    });
+  });
+};
+
 const squareClick = (column, row) => {
+  console.log("CHECK DRAW FUNCTION --> ", checkDraw(currentPlayer));
   // console.log("coordinates", column, row);
   // console.log("BOARD squareClick", board);
 
@@ -30,6 +43,7 @@ const squareClick = (column, row) => {
   if (board[column][row] === "") {
     // alter the data array, set it to the current player
     board[column][row] = currentPlayer;
+    console.log("CHECKWIN FUNCTUON --->> ", checkWin(currentPlayer));
     if (checkWin(currentPlayer) === true) {
       console.log("CHECK WIN TRUE");
 
@@ -43,7 +57,12 @@ const squareClick = (column, row) => {
         location.reload();
       }, 3000);
       console.log("YUP WON");
-    } else {
+
+      // !!! NOT COMPLETED \\ COME BACK TO THIS WHEN I HAVE TIME
+    } else if (checkDraw(currentPlayer) === true) {
+      const drawMessage = document.querySelector(".draw-message");
+      drawMessage.innerText = `OOPS!! Looks like a draw!!`;
+      console.log("DRAW%%%%%%");
     }
     // refresh the creen with a new board
     // according to the array that was just changed
