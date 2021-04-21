@@ -1,3 +1,43 @@
+h1 {
+  color: #625285;
+  font-family: "Orelega One", cursive;
+}
 body {
-  background-color: pink;
+  background-color: #e69a8dff;
+  text-align: center;
+}
+.board-box {
+  background-color: rgba(253, 253, 253, 0.897);
+  width: fit-content;
+  padding: 3px;
+  align-content: center;
+  border-radius: 4px;
+  margin: auto;
+}
+.square {
+  padding: 10px;
+  margin: 3px;
+  background-color: #907ac0;
+  display: inline-block;
+  height: 15px;
+  width: 15px;
+  vertical-align: top;
+  color: #fafafa;
+  font-family: "Orelega One", cursive;
+}
+.inputs {
+  background-color: #cbbaf0;
+  color: rgb(211, 127, 112);
+  height: 20px;
+  border-radius: 4px;
+}
+#submit-button {
+  background-color: #8d76be;
+  color: rgb(236, 161, 147);
+  height: 26px;
+  border: 10px #7865a1;
+  font-family: "Times New Roman", Times, serif;
+}
+.board {
+  text-align: center;
 }
